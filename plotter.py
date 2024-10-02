@@ -9,7 +9,6 @@ def display_result_plot():
 
 def plot_losses(losses):
     plt.plot(losses)
-    plt.ylim((3,4))
     plt.show()
 
 # stupid function but is more readable

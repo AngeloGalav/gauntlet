@@ -3,3 +3,4 @@ data/CIFAKE/test
 results
 .venv
 __pycache__
+*.pth

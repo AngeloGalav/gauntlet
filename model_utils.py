@@ -85,11 +85,11 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
     device = get_device()
     train_dataloader, val_dataloader = dataloaders
     weight_filename = f"best_{model_name}.pth"
+    losses = []
 
     # trains only if filename exists
     if not os.path.isfile(weight_filename) or force_train :
         best_loss = float('inf')
-        losses = []
         for t in range(epochs):
             print(f"Epoch {t+1}/{epochs}\n-------------------------------")
             #train step
@@ -105,6 +105,8 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
             losses.append(curr_loss)
 
     model=torch.load(weight_filename)
+    if losses != []:
+        return losses
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
@@ -128,7 +130,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
 
         if (batch + 1) % 40 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            print(f"training loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
 def test(dataloader, model, loss_fn, device, validation:bool=False):
@@ -139,14 +141,15 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
     '''
     # Set the model to evaluation mode
     model.eval()
-    size = len(dataloader)
-    num_batches = len(dataloader)
+    size = len(dataloader.dataset)
+    # num_batches = len(dataloader)
+    num_batches = len(dataloader.dataset)
     test_loss, correct = 0, 0
 
     with torch.no_grad():
         for X, y in dataloader:
             X = X.to(device)
-            y = np.array(y).to(device)
+            y = y.to(device)
             pred = model(X)
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
@@ -154,6 +157,6 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
     test_loss /= num_batches
     correct /= size
 
-    print(f" {'Validation' if validation else 'Test'} Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    print(f"{'Validation' if validation else 'Test'} Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     return test_loss
 

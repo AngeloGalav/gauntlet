@@ -11,6 +11,7 @@ Plz keep the todo list updated!
 - [x] Create some models
     - [ ] standard CNN
     - [ ] Fine-tuned resnet
+    - [ ] Implement early stopping
 - [ ] test models
 - [ ] do Xai stuff
     - [ ] find a method for XAI (LIME?)
