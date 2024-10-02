@@ -1,2 +1,5 @@
 data/CIFAKE/train
 data/CIFAKE/test
+results
+.venv
+__pycache__
