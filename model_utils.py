@@ -86,27 +86,35 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
     train_dataloader, val_dataloader = dataloaders
     weight_filename = f"best_{model_name}.pth"
     losses = []
+    train_accs = []
+    test_accs = []
 
     # trains only if filename exists
     if not os.path.isfile(weight_filename) or force_train :
         best_loss = float('inf')
         for t in range(epochs):
             print(f"Epoch {t+1}/{epochs}\n-------------------------------")
+
             #train step
-            train_loop(train_dataloader, model, loss_fn, optimizer, batch_size, device)
+            train_accuracy = train_loop(train_dataloader, model, loss_fn, optimizer, batch_size, device)
+            train_accs.append(train_accuracy)
+
             #eval step
-            curr_loss = test(val_dataloader, model, loss_fn, device, validation=True)
+            curr_loss, test_accuracy = test(val_dataloader, model, loss_fn, device, validation=True)
+
             if curr_loss < best_loss:
                 best_loss = curr_loss
                 print('new best model found')
                 if best_loss < loss_thresh:
                     torch.save(model.state_dict(), weight_filename)
                     print('best model saved')
+
             losses.append(curr_loss)
+            test_accs.append(test_accuracy)
 
     model.load_state_dict(torch.load(weight_filename))
     if losses != []:
-        return losses
+        return losses, train_accs, test_accs
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
@@ -115,14 +123,15 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
     '''
     size = len(dataloader.dataset)
     model.train()
+    correct = 0
 
     for batch, (X, y) in enumerate(dataloader):
         X = X.to(device)
         y = y.to(device)
         # Compute prediction and loss (fw)
         pred = model(X)
-        loss = loss_fn(pred, y)
-
+        pred = pred.squeeze()
+        loss = loss_fn(pred, y.float())
         # Zero the gradients (to prevent gradient accomulation)
         optimizer.zero_grad()
 
@@ -130,9 +139,16 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         loss.backward()
         optimizer.step()
 
+        # correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+        probabilities = torch.sigmoid(pred)
+        predictions = (probabilities > 0.5).float()
+        correct += (predictions == y).float().sum()
+        acc = correct/size
+
         if (batch + 1) % 40 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
-            print(f"training loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            print(f"training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}  [{current:>5d}/{size:>5d}]")
+    return acc
 
 
 def test(dataloader, model, loss_fn, device, validation:bool=False):
@@ -153,12 +169,16 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
             X = X.to(device)
             y = y.to(device)
             pred = model(X)
-            test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+            pred = pred.squeeze()
+            test_loss += loss_fn(pred, y.float()).item()
+            # correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+            probabilities = torch.sigmoid(pred)
+            predictions = (probabilities > 0.5).float()
+            correct += (predictions == y).float().sum()
 
     test_loss /= num_batches
-    correct /= size
+    acc = correct / size
 
-    print(f"{'Validation' if validation else 'Test'} Error:\n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-    return test_loss
+    print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    return test_loss, acc
 
