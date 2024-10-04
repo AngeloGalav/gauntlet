@@ -168,11 +168,11 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
         for X, y in dataloader:
             X = X.to(device)
             y = y.to(device)
-            pred = model(X)
-            pred = pred.squeeze()
-            test_loss += loss_fn(pred, y.float()).item()
+            logits = model(X)
+            logits = logits.squeeze()
+            test_loss += loss_fn(logits, y.float()).item()
             # correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-            probabilities = torch.sigmoid(pred)
+            probabilities = torch.sigmoid(logits)
             predictions = (probabilities > 0.5).float()
             correct += (predictions == y).float().sum()
 
@@ -181,4 +181,3 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
 
     print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     return test_loss, acc
-
