@@ -181,3 +181,21 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
 
     print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     return test_loss, acc
+
+def test_single_image(model, dataloader, index, device, plt) :
+    model.eval()
+    with torch.no_grad():
+        for X, y in dataloader:
+            image = X[index]
+            label = y[index]
+            
+            print(f"this is the image and has label {label}")
+            plt.imshow(image.permute(1, 2, 0))
+            
+            image = image.to(device)
+            logits = model(image.unsqueeze(0))
+            logits = logits.squeeze()
+            probabilities = torch.sigmoid(logits)
+            predictions = (probabilities > 0.5).float()
+            print("it was predicted as :", predictions)
+            break
