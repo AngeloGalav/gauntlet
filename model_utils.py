@@ -66,15 +66,13 @@ class CNN(nn.Module):
 
         return x
 
-class FTModel():
-    def __init__(self, model, num_classes=2) -> None:
-        # we can change it later if we find better models
-        self.model = model
+def prepare_for_ft(model, num_classes=2) -> None:
+    # we can change it later if we find better models
+    for param in model.parameters():
+        param.requires_grad = False
 
-        for param in self.model.parameters():
-            param.requires_grad = False
+    model.fc = nn.Linear(model.fc.in_features, num_classes)
 
-        self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
 
 
 def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs, loss_thresh=2.5, force_train=True):

@@ -23,7 +23,7 @@ from pytorch_grad_cam import AblationCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
-device = 'cpu'
+device = 'cuda'
 
 # LIME predict function, returns class probabilities
 def batch_predict(images, model):

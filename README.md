@@ -12,13 +12,14 @@ Plz keep the todo list updated!
     - [ ] test standard CNN
     - [x] Fine-tuned resnet
     - [ ] Implement early stopping?
-- [ ] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
+- [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
 - [x] test models
 - [ ] do Xai stuff
     - [x] find a method for XAI (LIME?)
-    - [ ] fix LIME (batch_predict)
+    - [x] fix LIME (batch_predict)
 - [ ] Add more graphs?
-- [ ] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
+- [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
+    - [ ] fix it (why doesnt it work????)
 - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
 ## Useful links
