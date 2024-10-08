@@ -35,6 +35,7 @@ def batch_predict(images, model):
 
 
 def explain_lime_single_image(dataloader, model):
+    model.eval()
     for images, _ in dataloader:
         # Select the first image in the batch
         image = images[0]  # Tensor format
@@ -73,8 +74,9 @@ def explain_lime_single_image(dataloader, model):
 
         break  # Only run for the first batch
 
+#TODO: change function so that it takes image index
 def explain_gradcam_single_image(dataloader, model, target_layers):
-    model.model.eval()
+    model.eval()
     for images, _ in dataloader:
 
         image = images[0]
@@ -96,3 +98,70 @@ def explain_gradcam_single_image(dataloader, model, target_layers):
         plt.imshow(image_mapper(image))
 
         break  # Only run for the first batch
+
+
+# def explain_gradcam_batch(
+#     dataloader,
+#     batch_size,
+#     show_label=True,
+#     batch_indices=lambda data_loader: [0, len(data_loader) - 2],
+#     columns=32,
+#     img_size=2
+# ):
+#     nrows = (batch_size // columns)
+#     batch_index = -1
+
+#     for images, labels in dataloader:
+#         batch_index += 1
+
+#         plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
+
+#         if show_label:
+#             plt.subplots_adjust(hspace=0.6)
+
+#         for i, (image, label) in enumerate(zip(images, labels)):
+#             plt.subplot(nrows, columns, i + 1)
+#             plt.axis("off")
+
+#             if show_label:
+#                 plt.title(label)
+
+#             plt.imshow(image_mapper(image))
+
+#         plt.show()
+
+#         print(f"Visualized batch #{batch_index + 1}!")
+
+
+def show_batches(
+    dataloader,
+    batch_size,
+    image_mapper=lambda image: image.permute(1, 2, 0),
+    show_label=True,
+    batch_indices=lambda data_loader: [0, len(data_loader) - 2],
+    columns=32,
+    img_size=2
+):
+    nrows = (batch_size // columns)
+    batch_index = -1
+
+    for images, labels in dataloader:
+        batch_index += 1
+
+        plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
+
+        if show_label:
+            plt.subplots_adjust(hspace=0.6)
+
+        for i, (image, label) in enumerate(zip(images, labels)):
+            plt.subplot(nrows, columns, i + 1)
+            plt.axis("off")
+
+            if show_label:
+                plt.title(label)
+
+            plt.imshow(image_mapper(image))
+
+        plt.show()
+
+        print(f"Visualized batch #{batch_index + 1}!")
