@@ -74,6 +74,34 @@ def prepare_for_ft(model, num_classes=2) -> None:
     model.fc = nn.Linear(model.fc.in_features, num_classes)
 
 
+# modified resnet with more fc
+class ModifiedResNet(nn.Module):
+    def __init__(self, original_resnet, num_classes=1, hidden_size1=1024, hidden_size2=512):
+        super(ModifiedResNet, self).__init__()
+        # Use the original ResNet up to the global average pooling layer
+        self.resnet = nn.Sequential(*list(original_resnet.children())[:-1])
+
+        in_features = original_resnet.fc.in_features
+        # additional linear layers
+        self.fc1 = nn.Linear(in_features, hidden_size1)
+        self.fc2 = nn.Linear(hidden_size1, hidden_size2)
+        self.fc3 = nn.Linear(hidden_size2, num_classes)
+        
+
+    def prepare_for_ft(self):
+        for param in self.resnet.parameters():
+            param.requires_grad = False
+
+    def forward(self, x):
+        x = self.resnet(x)  # Pass through the ResNet layers
+        x = torch.flatten(x, 1)  # Flatten the output
+
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+
+        return x
+
 
 def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs, loss_thresh=2.5, force_train=True):
     '''
@@ -197,3 +225,4 @@ def test_single_image(model, dataloader, index, device, plt) :
             predictions = (probabilities > 0.5).float()
             print("it was predicted as :", predictions)
             break
+
