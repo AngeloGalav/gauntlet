@@ -19,8 +19,15 @@ Plz keep the todo list updated!
     - [x] fix LIME (batch_predict)
 - [ ] Add more graphs?
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
-    - [ ] fix it (why doesnt it work????)
-- [ ] solve all the other code TODOs (ctrl+shift+f TODO)
+
+- [ ] test with new image dataset
+    - [ ] Add transformation pipeline
+    - [ ] 
+- [ ] Misc
+    - [ ] save graph and data (e.g. csv) to files for easier comparison
+    - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
+
+- [ ] Wait for professor's new directives
 
 ## Useful links
 https://coderzcolumn.com/tutorials/artificial-intelligence/lime-explain-keras-image-classification-network-predictions

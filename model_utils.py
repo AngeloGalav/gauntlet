@@ -76,8 +76,9 @@ def prepare_for_ft(model, num_classes=2) -> None:
 
 # modified resnet with more fc
 class ModifiedResNet(nn.Module):
-    def __init__(self, original_resnet, num_classes=1, hidden_size1=1024, hidden_size2=512):
+    def __init__(self, original_resnet, use_dropout=False, num_classes=1, hidden_size1=1024, hidden_size2=512):
         super(ModifiedResNet, self).__init__()
+
         # Use the original ResNet up to the global average pooling layer
         self.resnet = nn.Sequential(*list(original_resnet.children())[:-1])
 
@@ -86,7 +87,11 @@ class ModifiedResNet(nn.Module):
         self.fc1 = nn.Linear(in_features, hidden_size1)
         self.fc2 = nn.Linear(hidden_size1, hidden_size2)
         self.fc3 = nn.Linear(hidden_size2, num_classes)
-        
+
+        self.use_dropout = use_dropout
+        if use_dropout:
+            self.dropout1 = nn.Dropout(0.5)  # First dropout layer
+            self.dropout2 = nn.Dropout(0.5)  # Second dropout laye
 
     def prepare_for_ft(self):
         for param in self.resnet.parameters():
@@ -97,7 +102,12 @@ class ModifiedResNet(nn.Module):
         x = torch.flatten(x, 1)  # Flatten the output
 
         x = torch.relu(self.fc1(x))
+        if self.use_dropout:      # apply dropout if enabled
+            x = self.dropout1(x)
+
         x = torch.relu(self.fc2(x))
+        if self.use_dropout:
+            x = self.dropout2(x)
         x = self.fc3(x)
 
         return x
