@@ -17,12 +17,12 @@ Plz keep the todo list updated!
 - [ ] do Xai stuff
     - [x] find a method for XAI (LIME?)
     - [x] fix LIME (batch_predict)
+    - [ ] try CAPTUM? (https://captum.ai/)
 - [ ] Add more graphs?
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
-
 - [ ] test with new image dataset
     - [ ] Add transformation pipeline
-    - [ ] 
+    - [ ] Add code for new image
 - [ ] Misc
     - [ ] save graph and data (e.g. csv) to files for easier comparison
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
