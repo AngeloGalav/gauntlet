@@ -157,8 +157,8 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
     '''
     Does a single train epoch step (i.e. perfoming backprop on all samples).
     '''
-    size = len(dataloader.dataset)
     model.train()
+    size = len(dataloader.dataset)
     correct = 0
 
     for batch, (X, y) in enumerate(dataloader):
@@ -175,15 +175,16 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         loss.backward()
         optimizer.step()
 
-        # correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         probabilities = torch.sigmoid(pred)
         predictions = (probabilities > 0.5).float()
-        correct += (predictions == y).float().sum()
-        acc = correct/size
 
+        correct += (predictions == y).float().sum()
+
+        # acc = correct/size
+        acc = (correct/((batch+1) * batch_size))
         if (batch + 1) % 40 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
-            print(f"training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}  [{current:>5d}/{size:>5d}]")
+            print(f"training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}%  [{current:>5d}/{size:>5d}]")
     return acc
 
 
@@ -207,7 +208,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
             logits = model(X)
             logits = logits.squeeze()
             test_loss += loss_fn(logits, y.float()).item()
-            # correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
             probabilities = torch.sigmoid(logits)
             predictions = (probabilities > 0.5).float()
             correct += (predictions == y).float().sum()
@@ -224,10 +225,10 @@ def test_single_image(model, dataloader, index, device, plt) :
         for X, y in dataloader:
             image = X[index]
             label = y[index]
-            
+
             print(f"this is the image and has label {label}")
             plt.imshow(image.permute(1, 2, 0))
-            
+
             image = image.to(device)
             logits = model(image.unsqueeze(0))
             logits = logits.squeeze()
