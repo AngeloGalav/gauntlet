@@ -1,7 +1,10 @@
-# ethics_project2
+# gauntlet
+> _"I used the AI to destroy the AI"_
+\- Thanos if he was a data scientist
+
 Pending
 
-How to use:
+## How to use:
 Place the respective datasets folders in the data folder
 (i.e. CIFAKE in CIFAKE folder)
 cant commit those since they are too big...
