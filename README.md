@@ -11,6 +11,7 @@ Place the respective datasets folders in the data folder:
 
 ## TODOs
 Plz keep the todo list updated!
+- [ ] IMPORTANT!!!! NEED TO FIX LABELS FOR IMAGES (ESTABLISH WHAT 0 AND 1 MEAN!!!!!!!!!!)
 - [x] Create some models
     - [ ] test standard CNN
     - [x] Fine-tuned resnet
@@ -23,11 +24,12 @@ Plz keep the todo list updated!
     - [ ] try CAPTUM? (https://captum.ai/)
 - [ ] Add more graphs?
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
-- [ ] test with new image dataset
-    - [ ] Add transformation pipeline
-    - [ ] Add code for new image
+- [x] test with new image dataset
+    - [x] Add transformation pipeline
+    - [x] Add code for new image
 - [ ] Misc
     - [ ] save graph and data (e.g. csv) to files for easier comparison
+    - [ ] Add text for various explanations
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
 - [ ] Wait for professor's new directives

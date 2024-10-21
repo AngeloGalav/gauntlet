@@ -166,7 +166,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         y = y.to(device)
         # Compute prediction and loss (fw)
         pred = model(X)
-        pred = pred.squeeze()
+        y = y.unsqueeze(1)
         loss = loss_fn(pred, y.float())
         # Zero the gradients (to prevent gradient accomulation)
         optimizer.zero_grad()
@@ -206,7 +206,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
             X = X.to(device)
             y = y.to(device)
             logits = model(X)
-            logits = logits.squeeze()
+            y = y.unsqueeze(1)
             test_loss += loss_fn(logits, y.float()).item()
 
             probabilities = torch.sigmoid(logits)
