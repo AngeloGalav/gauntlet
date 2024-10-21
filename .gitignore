@@ -4,3 +4,5 @@ results
 .venv
 __pycache__
 *.pth
+data/RealVsAiArt/AiArtData
+data/RealVsAiArt/RealArt

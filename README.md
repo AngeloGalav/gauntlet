@@ -5,9 +5,9 @@
 Pending
 
 ## How to use:
-Place the respective datasets folders in the data folder
-(i.e. CIFAKE in CIFAKE folder)
-cant commit those since they are too big...
+Place the respective datasets folders in the data folder:
+- CIFAKE contents into CIFAKE folder
+- RealVsAiArt contents into RealVsAiArt folder
 
 ## TODOs
 Plz keep the todo list updated!
@@ -31,6 +31,9 @@ Plz keep the todo list updated!
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
 - [ ] Wait for professor's new directives
+
+## Data
+https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download
 
 ## Useful links
 https://coderzcolumn.com/tutorials/artificial-intelligence/lime-explain-keras-image-classification-network-predictions
