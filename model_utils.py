@@ -123,7 +123,7 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
     weight_filename = f"best_{model_name}.pth"
     losses = []
     train_accs = []
-    test_accs = []
+    val_accs = []
 
     # trains only if filename exists
     if not os.path.isfile(weight_filename) or force_train :
@@ -136,7 +136,7 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
             train_accs.append(train_accuracy)
 
             #eval step
-            curr_loss, test_accuracy = test(val_dataloader, model, loss_fn, device, validation=True)
+            curr_loss, val_accuracy = test(val_dataloader, model, loss_fn, device, validation=True)
 
             if curr_loss < best_loss:
                 best_loss = curr_loss
@@ -146,11 +146,11 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
                     print('best model saved')
 
             losses.append(curr_loss)
-            test_accs.append(test_accuracy)
+            val_accs.append(val_accuracy)
 
     model.load_state_dict(torch.load(weight_filename))
     if losses != []:
-        return losses, train_accs, test_accs
+        return losses, train_accs, val_accs
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
