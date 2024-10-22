@@ -140,13 +140,14 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
 
             if curr_loss < best_loss:
                 best_loss = curr_loss
-                print('new best model found')
+                print("New best model found! (based on lowest loss)")
                 if best_loss < loss_thresh:
                     torch.save(model.state_dict(), weight_filename)
-                    print('best model saved')
+                    print('...and saved.')
 
             losses.append(curr_loss)
             val_accs.append(val_accuracy)
+            print("\n")
 
     model.load_state_dict(torch.load(weight_filename))
     if losses != []:
@@ -184,7 +185,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         acc = (correct/((batch+1) * batch_size))
         if (batch + 1) % 40 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
-            print(f"training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}%  [{current:>5d}/{size:>5d}]")
+            print(f"Training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}%  [{current:>5d}/{size:>5d}]")
     return acc
 
 
@@ -216,7 +217,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
     test_loss /= num_batches
     acc = correct / size
 
-    print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}")
     return test_loss, acc
 
 def test_single_image(model, dataloader, index, device, plt) :
