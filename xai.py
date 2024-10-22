@@ -4,6 +4,7 @@ from PIL import Image
 import torch.nn as nn
 import numpy as np
 import os, json
+from tqdm import tqdm
 
 import torch
 import torch.nn.functional as F
@@ -32,7 +33,6 @@ def batch_predict(images, model):
     logits = model(batch)
     probs = torch.sigmoid(logits)
     return probs.detach().cpu().numpy()
-
 
 def explain_lime_single_image(dataloader, model):
     model.eval()
@@ -75,17 +75,34 @@ def explain_lime_single_image(dataloader, model):
 
             break  # Only run for the first batch
 
-#TODO: change function so that it takes image index
 def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
     model.eval()
     with torch.no_grad():
-        for images, _ in dataloader:
+        for images, labels in dataloader :
+            images_dev  = images.to(device)
+            pred = model(images_dev)
+            probabilities = torch.sigmoid(pred)
+            predictions = (probabilities > 0.5).float()
             image = images[index]
             image_mapper = get_gradcam_mapper(model, target_layers)
 
-            plt.imshow(image_mapper(image))
+            # pretty imshow stuff
+            label = "REAL" if labels[index].item() == 0 else "FAKE"
+            predicted = "REAL" if predictions[index].cpu().item() == 0 else "FAKE"
+            title_color = "green" if labels[index].item() == predictions[index].cpu().item() else "red"
 
-            break  # Only run for the first batch
+            fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+            
+            original_image = image.permute(1, 2, 0).numpy()
+            ax[0].imshow(original_image)
+            ax[0].set_title("Original Image")
+            
+            ax[1].imshow(image_mapper(image))
+            ax[1].set_title("GradCAM")
+            fig.suptitle(f"Labelled {label}, Predicted {predicted}", x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
+
+            plt.show()
+            break
 
 def get_gradcam_mapper(model, target_layers) :
     am = AblationCAM(model=model, target_layers=target_layers)
