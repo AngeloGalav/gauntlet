@@ -15,7 +15,6 @@ Plz keep the todo list updated!
 - [x] Create some models
     - [ ] test standard CNN
     - [x] Fine-tuned resnet
-    - [ ] Implement early stopping (not so needed after all...)
     - [ ] Implement confusion matrix code
 - [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
 - [x] test models
@@ -25,8 +24,7 @@ Plz keep the todo list updated!
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
 - [ ] Plotting
-    - [ ] Add more graphs?
-    - [ ] Add batch visualization seen in other kaggle notebooks.
+    - [ ] f1, precision, recall graphs
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
 - [x] test with new image dataset
     - [x] Add transformation pipeline
