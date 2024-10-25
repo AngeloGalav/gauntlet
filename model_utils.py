@@ -126,7 +126,9 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
     losses = []
     train_accs = []
     val_accs = []
-
+    precisions = []
+    recalls = []
+    
     if not os.path.exists('models'):
         os.makedirs('models')
 
@@ -141,7 +143,10 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
             train_accs.append(train_accuracy)
 
             #eval step
-            curr_loss, val_accuracy = test(val_dataloader, model, loss_fn, device, validation=True)
+            curr_loss, val_accuracy, prec, rec = test(val_dataloader, model, loss_fn, device, validation=True)
+
+            precisions.append(prec)
+            recalls.append(rec)
 
             if curr_loss < best_loss:
                 best_loss = curr_loss
@@ -156,7 +161,7 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
 
     model.load_state_dict(torch.load(weight_filename))
     if losses != []:
-        return losses, train_accs, val_accs
+        return losses, train_accs, val_accs, precisions, recalls
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
@@ -192,6 +197,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         if (batch + 1) % 40 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
             print(f"Training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}%  [{current:>5d}/{size:>5d}]")
+
     return acc
 
 def confusion_matrix_computation(predictions, ground_truth):
@@ -260,22 +266,28 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
     acc = correct / size
     print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}")
     
-    cm = confusion_matrix_computation(total_predictions, total_gt)
-    tp, fp, fn, tn = cm.ravel()
-    print(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}")
+    if not validation:
+        cm = confusion_matrix_computation(total_predictions, total_gt)
+        tp, fp, fn, tn = cm.ravel()
+        print(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}")
 
-    if visualize:
-        #create dir if not created yet
-        if not os.path.exists('confusion_matrices'):
-            os.makedirs('confusion_matrices')
+        if visualize:
+            #create dir if not created yet
+            if not os.path.exists(f'{model_name}'):
+                os.makedirs(f'{model_name}')
 
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm,
-                              display_labels=[0, 1])
-        disp.plot().figure_.savefig(f'confusion_matrices/{model_name}_confusion_matrix.png')
-        plt.show()
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                                display_labels=[0, 1])
+            disp.plot().figure_.savefig(f'{model_name}/confusion_matrix.png')
+            plt.show()
 
-    prec, rec, f1 = metrics_computation(tp, fp, fn)
-    print(f"Precision: {prec:>0.1f}, Recall: {rec}, F1-Score: {f1}")
+        prec, rec, f1 = metrics_computation(tp, fp, fn)
+        print(f"Precision: {prec:>0.2f}, Recall: {rec:>0.2f}, F1-Score: {f1:>0.2f}")
+    else:
+        tp, fp, fn, _ = confusion_matrix_computation(total_predictions, total_gt).ravel()
+        prec, rec, _ = metrics_computation(tp, fp, fn)
+        return test_loss, acc, prec, rec
+
     return test_loss, acc
 
 def test_single_image(model, dataloader, index, device, plt) :

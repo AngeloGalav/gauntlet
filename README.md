@@ -24,7 +24,7 @@ Plz keep the todo list updated!
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
 - [ ] Plotting
-    - [ ] f1, precision, recall graphs
+    - [x] f1, precision, recall graphs
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
 - [x] test with new image dataset
     - [x] Add transformation pipeline
