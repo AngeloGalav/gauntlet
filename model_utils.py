@@ -69,7 +69,6 @@ class CNN(nn.Module):
         return x
 
 def prepare_for_ft(model, num_classes=2) -> None:
-    # we can change it later if we find better models
     for param in model.parameters():
         param.requires_grad = False
 
@@ -122,27 +121,27 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
     import os
     device = get_device()
     train_dataloader, val_dataloader = dataloaders
-    weight_filename = f"models/best_{model_name}.pth"
+    weight_path = f"checkpoints/best_{model_name}.pth"
     losses = []
     train_accs = []
     val_accs = []
     precisions = []
     recalls = []
-    
-    if not os.path.exists('models'):
-        os.makedirs('models')
+
+    if not os.path.exists('checkpoints'):
+        os.makedirs('checkpoints')
 
     # trains only if filename exists
-    if not os.path.isfile(weight_filename) or force_train :
+    if not os.path.isfile(weight_path) or force_train :
         best_loss = float('inf')
         for t in range(epochs):
             print(f"Epoch {t+1}/{epochs}\n-------------------------------")
 
-            #train step
+            # train step
             train_accuracy = train_loop(train_dataloader, model, loss_fn, optimizer, batch_size, device)
             train_accs.append(train_accuracy)
 
-            #eval step
+            # eval step
             curr_loss, val_accuracy, prec, rec = test(val_dataloader, model, loss_fn, device, validation=True)
 
             precisions.append(prec)
@@ -152,14 +151,14 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
                 best_loss = curr_loss
                 print("New best model found! (based on lowest loss)")
                 if best_loss < loss_thresh:
-                    torch.save(model.state_dict(), weight_filename)
+                    torch.save(model.state_dict(), weight_path)
                     print('...and saved.')
 
             losses.append(curr_loss)
             val_accs.append(val_accuracy)
             print("\n")
 
-    model.load_state_dict(torch.load(weight_filename))
+    model.load_state_dict(torch.load(weight_path))
     if losses != []:
         return losses, train_accs, val_accs, precisions, recalls
 
@@ -217,7 +216,7 @@ def confusion_matrix_computation(predictions, ground_truth):
     '''
     assert len(predictions) == len(ground_truth), "PREDICTIONS AND GROUND TRUTHS SHOULD HAVE THE SAME SIZE!"
 
-    #save cm for later visualization
+    # save cm for later visualization
     cm = confusion_matrix(ground_truth, predictions)
 
     return cm
@@ -265,20 +264,21 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
     test_loss /= num_batches
     acc = correct / size
     print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}")
-    
+
+    # compute cm only for test step
     if not validation:
         cm = confusion_matrix_computation(total_predictions, total_gt)
         tp, fp, fn, tn = cm.ravel()
         print(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}")
 
         if visualize:
-            #create dir if not created yet
-            if not os.path.exists(f'{model_name}'):
-                os.makedirs(f'{model_name}')
+            # create dir if not created yet
+            if not os.path.exists(f'outputs/{model_name}'):
+                os.makedirs(f'outputs/{model_name}')
 
             disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                                 display_labels=[0, 1])
-            disp.plot().figure_.savefig(f'{model_name}/confusion_matrix.png')
+            disp.plot().figure_.savefig(f'outputs/{model_name}/confusion_matrix.png')
             plt.show()
 
         prec, rec, f1 = metrics_computation(tp, fp, fn)
@@ -293,8 +293,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
     return test_loss, acc
 
 def save_to_file(acc, test_loss, tp, fp, fn, tn, prec, rec, f1, model_name):
-    
-    with open(f'{model_name}/report.txt', 'w') as f:
+    with open(f'outputs/{model_name}/report.txt', 'w') as f:
         f.write(f"Metrics report for {model_name}: \n")
         f.write(f"Accuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}\n")
         f.write(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}\n")

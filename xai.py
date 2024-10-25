@@ -26,14 +26,15 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 import torchvision.transforms as transforms
 
 device = 'cuda'
+save_results=True
 
-mean = [0.485, 0.456, 0.406]
-std = [0.229, 0.224, 0.225]
-
-
+def set_device(device_to_set):
+    global device
+    device = device_to_set
 
 # LIME predict function, returns class probabilities
 def batch_predict(images, model):
+    global device
     # Convert list of numpy arrays to tensor
     batch = torch.stack([torch.tensor(i).permute(2, 0, 1) for i in images]).to(device)
     logits = model(batch)
@@ -65,7 +66,7 @@ def explain_lime_single_image(dataloader, model):
             )
 
             fig = plt.figure(figsize=(15,5))
-
+            numpy_image = (invert_normalization(image)).permute(1, 2, 0).cpu().numpy()
             ax = fig.add_subplot(141)
             ax.imshow(numpy_image, cmap="gray");
             ax.set_title("Original Image")
@@ -82,6 +83,7 @@ def explain_lime_single_image(dataloader, model):
             break  # Only run for the first batch
 
 def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
+    global device
     model.eval()
     with torch.no_grad():
         for images, labels in dataloader :
@@ -98,13 +100,13 @@ def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
             title_color = "green" if labels[index].item() == predictions[index].cpu().item() else "red"
 
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-            
+
             image = invert_normalization(image)
 
             original_image = image.permute(1, 2, 0).numpy()
             ax[0].imshow(original_image)
             ax[0].set_title("Original Image")
-            
+
             ax[1].imshow(image_mapper(image))
             ax[1].set_title("GradCAM")
             fig.suptitle(f"Labelled {label}, Predicted {predicted}", x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
@@ -114,7 +116,7 @@ def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
 
 def get_gradcam_mapper(model, target_layers) :
     am = AblationCAM(model=model, target_layers=target_layers)
-    
+
     def image_mapper(image):
         grayscale_am = am(
             input_tensor=image.unsqueeze(0),
@@ -126,7 +128,6 @@ def get_gradcam_mapper(model, target_layers) :
             grayscale_am,
             use_rgb=True,
         )
-    
 
     return image_mapper
 
@@ -162,12 +163,14 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_lab
         break # shows a single batch for now
 
 def invert_normalization(tensor):
+    mean = [0.485, 0.456, 0.406]
+    std = [0.229, 0.224, 0.225]
     inv_normalize = transforms.Normalize(
         mean=[-m/s for m, s in zip(mean, std)],
         std=[1/s for s in std]
     )
     tensor = inv_normalize(tensor)
-    
+
     return tensor
 
 

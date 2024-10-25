@@ -5,54 +5,61 @@ from PIL import Image, ImageOps
 import random
 import os
 
-def display_result_plot():
-    ...
+save_plots = True
 
+# TODO: delete this function if it not used anywhere
 def plot_losses(losses):
     plt.plot(losses)
     plt.show()
 
-# stupid function but is more readable
-def display_image(image):
-    plt.imshow(image);
+# TODO: test for loss as well
+def plot_generic_metrics(values, metric: str, model_name=None):
+    """
+    plot function used to compare the metrics between the training and
+    testing phase. It supports both loss and accuracy metrics.
+    """
+    global save_plots
 
-def plot_metrics(values, metric: str, model_name):
-    if not os.path.exists(f'{model_name}'):
-        os.makedirs(f'{model_name}')
-
-    train_val, test_val = values
-    train_accs_cpu = [t.cpu() for t in train_val if t.is_cuda]
-    test_accs_cpu = [t.cpu() for t in test_val if t.is_cuda]
-    plt.plot(train_accs_cpu, label = metric)
-    plt.plot(test_accs_cpu, label='val_' + metric)
+    train_metrics, val_metrics = values
+    train_metrics_cpu = [t.cpu() for t in train_metrics if t.is_cuda]
+    val_metrics_cpu = [t.cpu() for t in val_metrics if t.is_cuda]
+    plt.plot(train_metrics_cpu, marker='o', label=f"train_{metric}")
+    plt.plot(val_metrics_cpu, marker='o', label=f"val_{metric}")
     plt.xlabel('Epochs')
     plt.ylabel(metric)
     plt.legend()
-    plt.savefig(f'{model_name}/accuracies.png')
+    if save_plots and model_name is not None:
+        if not os.path.exists(f'outputs/{model_name}'):
+            os.makedirs(f'outputs/{model_name}')
+        plt.savefig(f'outputs/{model_name}/{metric}.png')
     plt.show()
 
-def plot_precision_recall_curve(precisions, recalls, model_name):
+def plot_precision_recall_curve(precisions, recalls, model_name=None):
     '''
     Plots precision-recall curve, and also precision curve and recall curve
     '''
-    
-    if not os.path.exists(f'{model_name}'):
-        os.makedirs(f'{model_name}')
+    # precision curve and recall curve over epochs
+    global save_plots
 
     assert len(precisions) == len(recalls), "PRECISIONS AND RECALLS MUST HAVE THE SAME SIZE!"
     epochs = [i+1 for i in range(len(precisions))]
 
     plt.figure(figsize=(10, 6))
-    plt.plot(epochs, precisions, label='Precision', color='blue', marker='o')
-    plt.plot(epochs, recalls, label='Recall', color='orange', marker='o')
+    plt.plot(precisions, label='Precision', marker='o')
+    plt.plot(recalls, label='Recall', marker='o')
     plt.title('Precision and Recall over Epochs')
     plt.xlabel('Epochs')
     plt.ylabel('Value')
-    plt.xticks(epochs)  # Show each epoch on the x-axis
     plt.legend(loc='best')
-    plt.savefig(f'{model_name}/pr_over_epochs.png', format='png')
+
+    if save_plots and model_name is not None:
+        if not os.path.exists(f'outputs/{model_name}'):
+            os.makedirs(f'outputs/{model_name}')
+        plt.savefig(f'outputs/{model_name}/pr_over_epochs.png', format='png')
+
     plt.show()
 
+    # display (and save) precision/recall curve
     prec_rec_map = {}
     for i in range(len(precisions)):
         prec_rec_map[recalls[i]] = precisions[i]
@@ -62,9 +69,14 @@ def plot_precision_recall_curve(precisions, recalls, model_name):
     for i in range(len(recalls)):
         sorted_precisions.append(prec_rec_map[recalls[i]])
 
-    plt.plot(recalls, sorted_precisions, marker='o', color='blue')
+    plt.plot(recalls, sorted_precisions, marker='o', color='green')
     plt.title('Precision-Recall Curve')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.savefig(f'{model_name}/pr_curve.png', format='png')
+
+    if save_plots and model_name is not None:
+        if not os.path.exists(f'outputs/{model_name}'):
+            os.makedirs(f'outputs/{model_name}')
+        plt.savefig(f'outputs/{model_name}/pr_curve.png', format='png')
+
     plt.show()
