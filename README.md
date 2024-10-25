@@ -26,6 +26,7 @@ Place the respective datasets folders in the data folder:
     - [ ] output prediction probability (useful if we make webapp)
 - [x] Plotting
     - [x] f1, precision, recall graphs
+    - [ ] update LIME function to show predicted/label etc...
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
 - [x] test with new image dataset
     - [x] Add transformation pipeline
