@@ -16,6 +16,7 @@ Plz keep the todo list updated!
     - [ ] test standard CNN
     - [x] Fine-tuned resnet
     - [x] Implement confusion matrix code
+    - [x] Use mixed data model
 - [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
 - [x] test models
 - [ ] do Xai stuff
@@ -35,6 +36,7 @@ Plz keep the todo list updated!
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
 - [ ] Wait for professor's new directives
+- [ ] REMEMBER TO FIX DATALOADER OF CIFAKE!!!!
 
 ## Data
 https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download

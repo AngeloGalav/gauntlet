@@ -69,7 +69,7 @@ class CIFAKEDataset(Dataset):
         if self.transform:
             image = self.transform(image)
 
-        return to_tensor(image), label
+        return image, label
 
 
 class RVAADataset(Dataset):
@@ -154,11 +154,24 @@ def pad_to_square(image):
 
 # Does train/val/test split
 def train_test_split(split_ratio, dataset):
-    train_ratio, val_ratio = split_ratio
-    train_size = int(train_ratio * len(dataset))
-    val_size = int(val_ratio * len(dataset))
-    test_size = len(dataset) - train_size - val_size
+    """
+    Create dataset split to train and test, randomly.
+    If the split is a tuple, it creates 3 splits of the dataset
+    (train, val, test). Otherwise, it creates 2 splits (train, test)
+    """
+    if isinstance(split_ratio, tuple):
+        train_ratio, val_ratio = split_ratio
+        train_size = int(train_ratio * len(dataset))
+        val_size = int(val_ratio * len(dataset))
+        test_size = len(dataset) - train_size - val_size
 
-    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
-    return train_dataset, val_dataset, test_dataset
+        train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+        return train_dataset, val_dataset, test_dataset
+    else:
+        train_ratio = split_ratio
+        train_size = int(train_ratio * len(dataset))
+        test_size = int((1-train_ratio) * len(dataset))
+
+        train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+        return train_dataset, test_dataset
 
