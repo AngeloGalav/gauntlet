@@ -15,7 +15,7 @@ Plz keep the todo list updated!
 - [x] Create some models
     - [ ] test standard CNN
     - [x] Fine-tuned resnet
-    - [ ] Implement confusion matrix code
+    - [x] Implement confusion matrix code
 - [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
 - [x] test models
 - [ ] do Xai stuff

@@ -9,7 +9,9 @@ import torch.nn.functional as F
 import numpy as np
 import pandas as pd
 import random
-
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+import os
 
 def get_device():
     '''Sets device for operation
@@ -120,10 +122,13 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
     import os
     device = get_device()
     train_dataloader, val_dataloader = dataloaders
-    weight_filename = f"best_{model_name}.pth"
+    weight_filename = f"models/best_{model_name}.pth"
     losses = []
     train_accs = []
     val_accs = []
+
+    if not os.path.exists('models'):
+        os.makedirs('models')
 
     # trains only if filename exists
     if not os.path.isfile(weight_filename) or force_train :
@@ -158,6 +163,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
     '''
     Does a single train epoch step (i.e. perfoming backprop on all samples).
     '''
+
     model.train()
     size = len(dataloader.dataset)
     correct = 0
@@ -188,8 +194,39 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
             print(f"Training loss: {loss:>7f}, train accuracy: {(100*acc):>0.2f}%  [{current:>5d}/{size:>5d}]")
     return acc
 
+def confusion_matrix_computation(predictions, ground_truth):
+    '''
+    Computes the confusion matrix for the given predictions.
 
-def test(dataloader, model, loss_fn, device, validation:bool=False):
+    Args:
+        - predictions: array of predictions of the network (either 0 or 1).
+        - ground_truth: array with the ground truths (either 0 or 1).
+
+    Returns:
+        - cm: the confusion matrix, which contains:
+            - tp: true positives (pred == 1 & gt == 1).
+            - fp: false positives (pred == 1 & gt == 0).
+            - fn: false negatives (pred == 0 & gt == 1).
+            - tn: true negatives (pred == 0 & gt == 0).
+    '''
+    assert len(predictions) == len(ground_truth), "PREDICTIONS AND GROUND TRUTHS SHOULD HAVE THE SAME SIZE!"
+
+    #save cm for later visualization
+    cm = confusion_matrix(ground_truth, predictions)
+
+    return cm
+
+def metrics_computation(tp, fp, fn):
+    '''
+    Computes precision, recall and f1.
+    '''
+    precision = tp / (tp + fp) if (tp+fp) != 0 else 0
+    recall = tp / (tp + fn) if (tp+fn) != 0 else 0
+    f1_score = (2 * precision * recall) / (precision + recall) if (precision + recall) != 0 else 0
+
+    return precision, recall, f1_score
+
+def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:str='',visualize:bool=False):
     '''
     Computes loss on the test/val set (without backprop) on all samples.
 
@@ -201,6 +238,8 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
     # num_batches = len(dataloader)
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
+    total_predictions = []
+    total_gt = []
 
     with torch.no_grad():
         for X, y in dataloader:
@@ -214,10 +253,29 @@ def test(dataloader, model, loss_fn, device, validation:bool=False):
             predictions = (probabilities > 0.5).float()
             correct += (predictions == y).float().sum()
 
+            total_predictions.extend(predictions.detach().cpu().numpy())
+            total_gt.extend(y.detach().cpu().numpy())
+
     test_loss /= num_batches
     acc = correct / size
-
     print(f"{'Validation' if validation else 'Test'} Error:\nAccuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}")
+    
+    cm = confusion_matrix_computation(total_predictions, total_gt)
+    tp, fp, fn, tn = cm.ravel()
+    print(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}")
+
+    if visualize:
+        #create dir if not created yet
+        if not os.path.exists('confusion_matrices'):
+            os.makedirs('confusion_matrices')
+
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                              display_labels=[0, 1])
+        disp.plot().figure_.savefig(f'confusion_matrices/{model_name}_confusion_matrix.png')
+        plt.show()
+
+    prec, rec, f1 = metrics_computation(tp, fp, fn)
+    print(f"Precision: {prec:>0.1f}, Recall: {rec}, F1-Score: {f1}")
     return test_loss, acc
 
 def test_single_image(model, dataloader, index, device, plt) :
@@ -237,4 +295,3 @@ def test_single_image(model, dataloader, index, device, plt) :
             predictions = (probabilities > 0.5).float()
             print("it was predicted as :", predictions)
             break
-
