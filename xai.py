@@ -23,8 +23,14 @@ import numpy as np
 from pytorch_grad_cam import AblationCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
+import torchvision.transforms as transforms
 
 device = 'cuda'
+
+mean = [0.485, 0.456, 0.406]
+std = [0.229, 0.224, 0.225]
+
+
 
 # LIME predict function, returns class probabilities
 def batch_predict(images, model):
@@ -93,6 +99,8 @@ def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
 
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
             
+            image = invert_normalization(image)
+
             original_image = image.permute(1, 2, 0).numpy()
             ax[0].imshow(original_image)
             ax[0].set_title("Original Image")
@@ -106,7 +114,7 @@ def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
 
 def get_gradcam_mapper(model, target_layers) :
     am = AblationCAM(model=model, target_layers=target_layers)
-
+    
     def image_mapper(image):
         grayscale_am = am(
             input_tensor=image.unsqueeze(0),
@@ -118,6 +126,7 @@ def get_gradcam_mapper(model, target_layers) :
             grayscale_am,
             use_rgb=True,
         )
+    
 
     return image_mapper
 
@@ -151,6 +160,15 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_lab
 
         print(f"Visualized batch #{batch_index + 1}!")
         break # shows a single batch for now
+
+def invert_normalization(tensor):
+    inv_normalize = transforms.Normalize(
+        mean=[-m/s for m, s in zip(mean, std)],
+        std=[1/s for s in std]
+    )
+    tensor = inv_normalize(tensor)
+    
+    return tensor
 
 
 # def show_batches(

@@ -283,12 +283,22 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
 
         prec, rec, f1 = metrics_computation(tp, fp, fn)
         print(f"Precision: {prec:>0.2f}, Recall: {rec:>0.2f}, F1-Score: {f1:>0.2f}")
+
+        save_to_file(acc, test_loss, tp, fp, fn, tn, prec, rec, f1, model_name)
     else:
         tp, fp, fn, _ = confusion_matrix_computation(total_predictions, total_gt).ravel()
         prec, rec, _ = metrics_computation(tp, fp, fn)
         return test_loss, acc, prec, rec
 
     return test_loss, acc
+
+def save_to_file(acc, test_loss, tp, fp, fn, tn, prec, rec, f1, model_name):
+    
+    with open(f'{model_name}/report.txt', 'w') as f:
+        f.write(f"Metrics report for {model_name}: \n")
+        f.write(f"Accuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}\n")
+        f.write(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}\n")
+        f.write(f"Precision: {prec:>0.2f}, Recall: {rec:>0.2f}, F1-Score: {f1:>0.2f}")
 
 def test_single_image(model, dataloader, index, device, plt) :
     model.eval()
