@@ -22,7 +22,7 @@ Place the respective datasets folders in the data folder:
     - [x] fix LIME (batch_predict)
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
-    - [ ] save gradcam/lime result
+    - [ ] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
     - [ ] output prediction probability (useful if we make webapp)
 - [x] Plotting
     - [x] f1, precision, recall graphs
@@ -31,10 +31,12 @@ Place the respective datasets folders in the data folder:
 - [x] test with new image dataset
     - [x] Add transformation pipeline
     - [x] Add code for new image
-    - [ ] fix data augmentation
+    - [x] fix data augmentation
     - [ ] RANDOM ASS PERFORMANCE DEGRATION IN RVAA?????????
+    - [ ] set SEED better (galf ignora)
 - [x] Misc
     - [x] save graph and data (e.g. csv) to files for easier comparison
+        - [x] Fix report.txt bug (sometimes it does not get saved??? also there's on in outputs/report...)
     - [ ] add display mode (meaning, add a boolean/var so that it can be set to off or on when displaying plots on the notebook, so that the notebook is not cluttered, at least not in this phase of dev)
     - [ ] Add text for various explanations
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)

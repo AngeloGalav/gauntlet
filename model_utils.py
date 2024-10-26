@@ -271,7 +271,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
         tp, fp, fn, tn = cm.ravel()
         print(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}")
 
-        if visualize:
+        if visualize and model_name != '':
             # create dir if not created yet
             if not os.path.exists(f'outputs/{model_name}'):
                 os.makedirs(f'outputs/{model_name}')
@@ -293,6 +293,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
     return test_loss, acc
 
 def save_to_file(acc, test_loss, tp, fp, fn, tn, prec, rec, f1, model_name):
+    assert model_name != "" or model_name is not None, "The model_name must not be either an empty string or None."
     with open(f'outputs/{model_name}/report.txt', 'w') as f:
         f.write(f"Metrics report for {model_name}: \n")
         f.write(f"Accuracy: {(100*acc):>0.1f}%, Avg loss: {test_loss:>8f}\n")
