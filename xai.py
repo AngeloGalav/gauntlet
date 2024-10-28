@@ -41,15 +41,31 @@ def batch_predict(images, model):
     probs = torch.sigmoid(logits)
     return probs.detach().cpu().numpy()
 
-def explain_lime_single_image(dataloader, model):
+def get_predicted_label(labels, predictions, idx):
+    """
+    Get label, prediction and title color for pretty print of results.
+    """
+    label = "REAL" if labels[idx].item() == 0 else "FAKE"
+    predicted = "REAL" if predictions[idx].cpu().item() == 0 else "FAKE"
+    title_color = "green" if labels[idx].item() == predictions[idx].cpu().item() else "red"
+
+    return label, predicted, title_color
+
+def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=None, index=0):
     model.eval()
     with torch.no_grad():
-        for images, _ in dataloader:
+        for images, labels in dataloader:
             # Select the first image in the batch
-            image = images[0]  # Tensor format
+
+            images_dev  = images.to(device)
+            pred = model(images_dev)
+            probabilities = torch.sigmoid(pred)
+            predictions = (probabilities > 0.5).float()
+            image = images[index]
 
             # place data in correct channels
             numpy_image = image.permute(1, 2, 0).cpu().numpy()
+            
 
             # Initialize LIME Image Explainer
             explainer = lime_image.LimeImageExplainer()
@@ -64,9 +80,12 @@ def explain_lime_single_image(dataloader, model):
                 positive_only=False,
                 hide_rest=True
             )
+            
+            label, predicted, title_color = get_predicted_label(labels, predictions, index)
 
             fig = plt.figure(figsize=(15,5))
             numpy_image = (invert_normalization(image)).permute(1, 2, 0).cpu().numpy()
+
             ax = fig.add_subplot(141)
             ax.imshow(numpy_image, cmap="gray");
             ax.set_title("Original Image")
@@ -77,12 +96,20 @@ def explain_lime_single_image(dataloader, model):
             ax.imshow(mask);
             ax.set_title("Mask")
             ax = fig.add_subplot(144)
-            ax.imshow(mark_boundaries(img, mask, color=(0,1,0)));
+            ax.imshow(mark_boundaries(img, mask, color=(0,0,1)));
             ax.set_title("Image+Mask Combined");
+            fig.suptitle(f"Labelled {label}, Predicted {predicted}", x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
+            
+            if model_name != None and dataset_name != None:
+                if not os.path.exists(f'outputs/{model_name}/lime/{dataset_name}/'):
+                    os.makedirs(f'outputs/{model_name}/lime/{dataset_name}/')
+
+                plt.savefig(f"outputs/{model_name}/lime/{dataset_name}/lime_example_{index}.png", bbox_inches='tight')
+            plt.show()
 
             break  # Only run for the first batch
 
-def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
+def explain_gradcam_single_image(dataloader, model, target_layers, model_name=None, dataset_name=None, index=0):
     global device
     model.eval()
     with torch.no_grad():
@@ -95,9 +122,7 @@ def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
             image_mapper = get_gradcam_mapper(model, target_layers)
 
             # pretty imshow stuff
-            label = "REAL" if labels[index].item() == 0 else "FAKE"
-            predicted = "REAL" if predictions[index].cpu().item() == 0 else "FAKE"
-            title_color = "green" if labels[index].item() == predictions[index].cpu().item() else "red"
+            label, predicted, title_color = get_predicted_label(labels, predictions, index)
 
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
@@ -111,6 +136,11 @@ def explain_gradcam_single_image(dataloader, model, target_layers, index=0):
             ax[1].set_title("GradCAM")
             fig.suptitle(f"Labelled {label}, Predicted {predicted}", x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
 
+            if model_name != None and dataset_name != None:
+                if not os.path.exists(f'outputs/{model_name}/grad_cam/{dataset_name}/'):
+                    os.makedirs(f'outputs/{model_name}/grad_cam/{dataset_name}/')
+
+                plt.savefig(f"outputs/{model_name}/grad_cam/{dataset_name}/grad_example_{index}.png", bbox_inches='tight')
             plt.show()
             break
 

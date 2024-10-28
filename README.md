@@ -22,11 +22,11 @@ Place the respective datasets folders in the data folder:
     - [x] fix LIME (batch_predict)
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
-    - [ ] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
+    - [x] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
     - [ ] output prediction probability (useful if we make webapp)
 - [x] Plotting
     - [x] f1, precision, recall graphs
-    - [ ] update LIME function to show predicted/label etc...
+    - [x] update LIME function to show predicted/label etc...
 - [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
 - [x] test with new image dataset
     - [x] Add transformation pipeline

@@ -42,7 +42,7 @@ def plot_precision_recall_curve(precisions, recalls, model_name=None):
     global save_plots
 
     assert len(precisions) == len(recalls), "PRECISIONS AND RECALLS MUST HAVE THE SAME SIZE!"
-    epochs = [i+1 for i in range(len(precisions))]
+    #epochs = [i+1 for i in range(len(precisions))]
 
     plt.figure(figsize=(10, 6))
     plt.plot(precisions, label='Precision', marker='o')
