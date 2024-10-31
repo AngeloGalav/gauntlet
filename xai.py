@@ -81,6 +81,10 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
                 hide_rest=True
             )
             
+            probability = probabilities[index].item()  # Probability of being "fake"
+            fake_prob = probability * 100
+            real_prob = (1 - probability) * 100
+
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
 
             fig = plt.figure(figsize=(15,5))
@@ -98,7 +102,9 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
             ax = fig.add_subplot(144)
             ax.imshow(mark_boundaries(img, mask, color=(0,0,1)));
             ax.set_title("Image+Mask Combined");
-            fig.suptitle(f"Labelled {label}, Predicted {predicted}", x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
+            fig.suptitle(f"Labelled {label}, Predicted {predicted}\n"
+                        f"Fake Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
+                        x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
             
             if model_name != None and dataset_name != None:
                 if not os.path.exists(f'outputs/{model_name}/lime/{dataset_name}/'):
@@ -113,36 +119,48 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
     global device
     model.eval()
     with torch.no_grad():
-        for images, labels in dataloader :
-            images_dev  = images.to(device)
-            pred = model(images_dev)
-            probabilities = torch.sigmoid(pred)
+        for images, labels in dataloader:
+            images_dev = images.to(device)
+            # Get raw model output
+            raw_output = model(images_dev)
+            probabilities = torch.sigmoid(raw_output)  # Apply sigmoid to get probability
             predictions = (probabilities > 0.5).float()
+            
+            # Get the specific image and probability
             image = images[index]
-            image_mapper = get_gradcam_mapper(model, target_layers)
-
-            # pretty imshow stuff
+            probability = probabilities[index].item()  # Probability of being "fake"
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
-
+            
+            # Setup for GradCAM
+            image_mapper = get_gradcam_mapper(model, target_layers)
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
+            # Prepare original image for display
             image = invert_normalization(image)
-
             original_image = image.permute(1, 2, 0).numpy()
             ax[0].imshow(original_image)
             ax[0].set_title("Original Image")
 
+            # Display GradCAM overlay
             ax[1].imshow(image_mapper(image))
             ax[1].set_title("GradCAM")
-            fig.suptitle(f"Labelled {label}, Predicted {predicted}", x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
 
-            if model_name != None and dataset_name != None:
-                if not os.path.exists(f'outputs/{model_name}/grad_cam/{dataset_name}/'):
-                    os.makedirs(f'outputs/{model_name}/grad_cam/{dataset_name}/')
+            # Show probability on the title
+            fake_prob = probability * 100
+            real_prob = (1 - probability) * 100
+            fig.suptitle(f"Labelled: {label}, Predicted: {predicted}\n"
+                         f"Fake Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
+                         x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
 
-                plt.savefig(f"outputs/{model_name}/grad_cam/{dataset_name}/grad_example_{index}.png", bbox_inches='tight')
+            # Save the figure if model and dataset names are provided
+            if model_name and dataset_name:
+                save_path = f'outputs/{model_name}/grad_cam/{dataset_name}/'
+                os.makedirs(save_path, exist_ok=True)
+                plt.savefig(f"{save_path}/grad_example_{index}.png", bbox_inches='tight')
+
             plt.show()
             break
+
 
 def get_gradcam_mapper(model, target_layers) :
     am = AblationCAM(model=model, target_layers=target_layers)

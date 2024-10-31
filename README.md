@@ -23,7 +23,7 @@ Place the respective datasets folders in the data folder:
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
     - [x] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
-    - [ ] output prediction probability (useful if we make webapp)
+    - [x] output prediction probability (useful if we make webapp)
 - [x] Plotting
     - [x] f1, precision, recall graphs
     - [x] update LIME function to show predicted/label etc...
