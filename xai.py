@@ -121,14 +121,14 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
     with torch.no_grad():
         for images, labels in dataloader:
             images_dev = images.to(device)
+
             # Get raw model output
             raw_output = model(images_dev)
-            probabilities = torch.sigmoid(raw_output)  # Apply sigmoid to get probability
+            probabilities = torch.sigmoid(raw_output)
             predictions = (probabilities > 0.5).float()
             
-            # Get the specific image and probability
             image = images[index]
-            probability = probabilities[index].item()  # Probability of being "fake"
+            probability = probabilities[index].item()
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
             
             # Setup for GradCAM
