@@ -12,6 +12,8 @@ import random
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import os
+import plotter
+
 
 def get_device():
     '''Sets device for operation
@@ -99,17 +101,28 @@ class ModifiedResNet(nn.Module):
             param.requires_grad = False
 
     def forward(self, x):
+        print(f"Input shape: {x.shape}")  # Print input shape
+
         x = self.resnet(x)  # Pass through the ResNet layers
+        print(f"After ResNet base: {x.shape}")  # Should be (batch_size, in_features, 1, 1) due to global pooling
+
         x = torch.flatten(x, 1)  # Flatten the output
+        print(f"After flattening: {x.shape}")  # Should be (batch_size, in_features)
 
         x = torch.relu(self.fc1(x))
-        if self.use_dropout:      # apply dropout if enabled
+        print(f"After fc1: {x.shape}")  # Should be (batch_size, hidden_size1)
+
+        if self.use_dropout:
             x = self.dropout1(x)
 
         x = torch.relu(self.fc2(x))
+        print(f"After fc2: {x.shape}")  # Should be (batch_size, hidden_size2)
+
         if self.use_dropout:
             x = self.dropout2(x)
+
         x = self.fc3(x)
+        print(f"After fc3 (final output): {x.shape}")  # Should be (batch_size, num_classes) -> (batch_size, 1)
 
         return x
 
@@ -231,7 +244,7 @@ def metrics_computation(tp, fp, fn):
 
     return precision, recall, f1_score
 
-def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:str='',visualize:bool=False):
+def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:str=''):
     '''
     Computes loss on the test/val set (without backprop) on all samples.
 
@@ -271,15 +284,20 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
         tp, fp, fn, tn = cm.ravel()
         print(f"Confusion matrix report, tp: {tp}, fp: {fp}, fn: {fn}, tn:{tn}")
 
-        if visualize and model_name != '':
+        if model_name != '':
             # create dir if not created yet
             if not os.path.exists(f'outputs/{model_name}'):
                 os.makedirs(f'outputs/{model_name}')
 
             disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                                 display_labels=[0, 1])
+            
             disp.plot().figure_.savefig(f'outputs/{model_name}/confusion_matrix.png')
-            plt.show()
+            display_mode =plotter.get_display_mode()
+            print(display_mode)
+            if plotter.get_display_mode():
+                plt.show()
+            plt.close()
 
         prec, rec, f1 = metrics_computation(tp, fp, fn)
         print(f"Precision: {prec:>0.2f}, Recall: {rec:>0.2f}, F1-Score: {f1:>0.2f}")

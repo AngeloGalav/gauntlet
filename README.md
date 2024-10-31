@@ -37,7 +37,7 @@ Place the respective datasets folders in the data folder:
 - [x] Misc
     - [x] save graph and data (e.g. csv) to files for easier comparison
         - [x] Fix report.txt bug (sometimes it does not get saved??? also there's on in outputs/report...)
-    - [ ] add display mode (meaning, add a boolean/var so that it can be set to off or on when displaying plots on the notebook, so that the notebook is not cluttered, at least not in this phase of dev)
+    - [x] add display mode (meaning, add a boolean/var so that it can be set to off or on when displaying plots on the notebook, so that the notebook is not cluttered, at least not in this phase of dev)
     - [ ] Add text for various explanations
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
