@@ -20,7 +20,7 @@ from skimage.segmentation import mark_boundaries
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pytorch_grad_cam import AblationCAM
+from pytorch_grad_cam import AblationCAM, ScoreCAM, GradCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 import torchvision.transforms as transforms
@@ -89,6 +89,9 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
 
             fig = plt.figure(figsize=(15,5))
             numpy_image = (invert_normalization(image)).permute(1, 2, 0).cpu().numpy()
+            # TEMPORARY FIX FOR LIME TITLE
+            plt.tight_layout(pad=0.5)  # Adjust 'pad' to control overall spacing
+            fig.subplots_adjust(top=0.85)  # Adjust top margin to move the title closer to the images
 
             ax = fig.add_subplot(141)
             ax.imshow(numpy_image, cmap="gray");
@@ -115,7 +118,7 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
 
             break  # Only run for the first batch
 
-def explain_gradcam_single_image(dataloader, model, target_layers, model_name=None, dataset_name=None, index=0):
+def explain_gradcam_single_image(dataloader, model, target_layers, model_name=None, dataset_name=None, index=0, mapper="ac"):
     global device
     model.eval()
     with torch.no_grad():
@@ -132,7 +135,7 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
             
             # Setup for GradCAM
-            image_mapper = get_gradcam_mapper(model, target_layers)
+            image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
             # Prepare original image for display
@@ -162,8 +165,18 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
             break
 
 
-def get_gradcam_mapper(model, target_layers) :
-    am = AblationCAM(model=model, target_layers=target_layers)
+def get_gradcam_mapper(model, target_layers, mapper="ac") :
+    if (mapper == "ac") :
+        # removes ports of the input to see which contributes more to the score
+        am = AblationCAM(model=model, target_layers=target_layers)
+    elif (mapper == "sc") :
+        # perturbates input using the activation from each feature map and scores them
+        # based on much they affect the target layer
+        am = ScoreCAM(model=model, target_layers=target_layers)
+    else :
+        # gradients of the target class flowing into the targer layers (FASTEST)
+        # am = GradCAM(model=model, target_layers=target_layers) # only available in training mode
+        am = AblationCAM(model=model, target_layers=target_layers)
 
     def image_mapper(image):
         grayscale_am = am(
@@ -180,10 +193,10 @@ def get_gradcam_mapper(model, target_layers) :
     return image_mapper
 
 
-def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_label=True, columns=32, img_size=2):
+def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_label=True, columns=32, img_size=2, mapper="ac"):
     model.eval()
 
-    image_mapper = get_gradcam_mapper(model, target_layers)
+    image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
 
     nrows = (batch_size // columns)
     batch_index = -1

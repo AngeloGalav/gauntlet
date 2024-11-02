@@ -93,36 +93,23 @@ class ModifiedResNet(nn.Module):
 
         self.use_dropout = use_dropout
         if use_dropout:
-            self.dropout1 = nn.Dropout(0.5)  # First dropout layer
-            self.dropout2 = nn.Dropout(0.5)  # Second dropout laye
+            self.dropout1 = nn.Dropout(0.5)
+            self.dropout2 = nn.Dropout(0.5)
 
     def prepare_for_ft(self):
         for param in self.resnet.parameters():
             param.requires_grad = False
 
     def forward(self, x):
-        print(f"Input shape: {x.shape}")  # Print input shape
-
-        x = self.resnet(x)  # Pass through the ResNet layers
-        print(f"After ResNet base: {x.shape}")  # Should be (batch_size, in_features, 1, 1) due to global pooling
-
-        x = torch.flatten(x, 1)  # Flatten the output
-        print(f"After flattening: {x.shape}")  # Should be (batch_size, in_features)
-
+        x = self.resnet(x)
+        x = torch.flatten(x, 1)
         x = torch.relu(self.fc1(x))
-        print(f"After fc1: {x.shape}")  # Should be (batch_size, hidden_size1)
-
         if self.use_dropout:
             x = self.dropout1(x)
-
         x = torch.relu(self.fc2(x))
-        print(f"After fc2: {x.shape}")  # Should be (batch_size, hidden_size2)
-
         if self.use_dropout:
             x = self.dropout2(x)
-
         x = self.fc3(x)
-        print(f"After fc3 (final output): {x.shape}")  # Should be (batch_size, num_classes) -> (batch_size, 1)
 
         return x
 
@@ -171,7 +158,8 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
             val_accs.append(val_accuracy)
             print("\n")
 
-    model.load_state_dict(torch.load(weight_path))
+    model.load_state_dict(torch.load(weight_path, weights_only=True))
+    model.eval()
     if losses != []:
         return losses, train_accs, val_accs, precisions, recalls
 
@@ -293,7 +281,7 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
                                 display_labels=[0, 1])
             
             disp.plot().figure_.savefig(f'outputs/{model_name}/confusion_matrix.png')
-            display_mode =plotter.get_display_mode()
+            display_mode = plotter.get_display_mode()
             print(display_mode)
             if plotter.get_display_mode():
                 plt.show()

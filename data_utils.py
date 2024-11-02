@@ -1,22 +1,12 @@
 # data preprocessing stuff here
-
-from pathlib import Path
-from PIL import Image, ImageOps
+from PIL import Image
 from torch import Tensor
-from torchvision.transforms.functional import to_tensor
-from torch.utils.data import Dataset, random_split
+from torch.utils.data import Dataset, random_split, Subset
 from typing import List, Tuple
-from torch import nn
-from matplotlib import pyplot as plt
 import numpy as np
 import os
-import pandas as pd
-from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 
-
-
-# TODO: make this more generic once we have the other dataset
 class CIFAKEDataset(Dataset):
     def __init__(self, root_dir, split="train", transform=None):
         """
@@ -153,7 +143,7 @@ def pad_to_square(image):
     return transforms.functional.pad(image, padding, fill=0)  # Add padding with black (fill=0)
 
 # Does train/val/test split
-def train_test_split(split_ratio, dataset):
+def train_test_split(split_ratio, dataset, isRandom=False):
     """
     Create dataset split to train and test, randomly.
     If the split is a tuple, it creates 3 splits of the dataset
@@ -165,13 +155,33 @@ def train_test_split(split_ratio, dataset):
         val_size = int(val_ratio * len(dataset))
         test_size = len(dataset) - train_size - val_size
 
-        train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+        if (isRandom):
+            train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+        else:
+            train_indices = list(range(0, train_size))
+            val_indices = list(range(train_size, train_size + val_size))
+            test_indices = list(range(train_size + val_size, len(dataset)))
+
+            train_dataset = Subset(dataset, train_indices)
+            val_dataset = Subset(dataset, val_indices)
+            test_dataset = Subset(dataset, test_indices)
+
         return train_dataset, val_dataset, test_dataset
     else:
+        # no val ratio given
         train_ratio = split_ratio
         train_size = int(train_ratio * len(dataset))
         test_size = int((1-train_ratio) * len(dataset))
 
-        train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+        if (isRandom):
+            train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+        else:
+            train_indices = list(range(0, train_size))
+            test_indices = list(range(train_size, train_size + test_size))
+
+            # Create train and test subsets
+            train_dataset = Subset(dataset, train_indices)
+            test_dataset = Subset(dataset, test_indices)
+
         return train_dataset, test_dataset
 

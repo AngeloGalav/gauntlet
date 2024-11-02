@@ -12,6 +12,11 @@ def get_display_mode():
 
     return DISPLAY_MODE
 
+def set_display_mode(mode):
+    global DISPLAY_MODE
+    DISPLAY_MODE = mode
+    return DISPLAY_MODE
+
 # TODO: delete this function if it not used anywhere
 def plot_losses(losses):
     plt.plot(losses)

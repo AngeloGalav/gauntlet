@@ -24,8 +24,8 @@ Place the respective datasets folders in the data folder:
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
     - [x] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
     - [x] output prediction probability (useful if we make webapp)
-    - [ ] batch lime/gradcam (not display only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
-    - [ ] test to see if we can use less layers in gradcam for speeding up the computation.
+    - [ ] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
+    - [x] test to see if we can use less layers in gradcam for speeding up the computation.
 - [x] Plotting
     - [x] f1, precision, recall graphs
     - [x] update LIME function to show predicted/label etc...
@@ -34,8 +34,6 @@ Place the respective datasets folders in the data folder:
     - [x] Add transformation pipeline
     - [x] Add code for new image
     - [x] fix data augmentation
-    - [ ] RANDOM ASS PERFORMANCE DEGRATION IN RVAA?????????
-    - [ ] set SEED better (galf ignora)
 - [x] Misc
     - [x] save graph and data (e.g. csv) to files for easier comparison
         - [x] Fix report.txt bug (sometimes it does not get saved??? also there's on in outputs/report...)
