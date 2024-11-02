@@ -194,6 +194,8 @@ def get_gradcam_mapper(model, target_layers, mapper="ac") :
 
 
 def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_label=True, columns=32, img_size=2, mapper="ac"):
+    # N.B.: AblationCAM and ScoreCAM have batched implementations.
+    # so it should be easy to transfer the batch representation to them.
     model.eval()
 
     image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)

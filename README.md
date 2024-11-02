@@ -25,7 +25,8 @@ Place the respective datasets folders in the data folder:
     - [x] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
     - [x] output prediction probability (useful if we make webapp)
     - [ ] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
-    - [x] test to see if we can use less layers in gradcam for speeding up the computation.
+    - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
+    - [ ] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
 - [x] Plotting
     - [x] f1, precision, recall graphs
     - [x] update LIME function to show predicted/label etc...
@@ -40,6 +41,15 @@ Place the respective datasets folders in the data folder:
     - [x] add display mode (meaning, add a boolean/var so that it can be set to off or on when displaying plots on the notebook, so that the notebook is not cluttered, at least not in this phase of dev)
     - [ ] Add text for various explanations
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
+
+- [ ] webapp fronted
+    - [ ] create frontend
+    - [ ] create dropdown menu with models
+    - [ ] image input
+    - [ ] display image output
+- [ ] webapp server
+    - [x] create tester app
+    - [ ] create gradcam func for single image
 
 ## Data
 https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download

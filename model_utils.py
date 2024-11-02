@@ -157,9 +157,12 @@ def train(dataloaders, loss_fn, optimizer, model, model_name, batch_size, epochs
             losses.append(curr_loss)
             val_accs.append(val_accuracy)
             print("\n")
+    try:
+        model.load_state_dict(torch.load(weight_path, weights_only=True))
+        print("Weights loaded successfully from", weight_path)
+    except Exception as e:
+        print("Failed to load weights:", e)
 
-    model.load_state_dict(torch.load(weight_path, weights_only=True))
-    model.eval()
     if losses != []:
         return losses, train_accs, val_accs, precisions, recalls
 
@@ -192,7 +195,6 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
 
         correct += (predictions == y).float().sum()
 
-        # acc = correct/size
         acc = (correct/((batch+1) * batch_size))
         if (batch + 1) % 40 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
