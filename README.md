@@ -15,6 +15,8 @@ Place the respective datasets folders in the data folder:
     - [x] Fine-tuned resnet
     - [x] Implement confusion matrix code
     - [x] Use mixed data model
+    - [ ] Implement data augmentation in Mixed model (maybe turn data augmentation dataset creation step into a function?)
+    - [ ] Fix Mixed Dataset model (accuracy stuck at 34.5%)
 - [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
 - [x] test models
 - [ ] do Xai stuff
@@ -22,6 +24,7 @@ Place the respective datasets folders in the data folder:
     - [x] fix LIME (batch_predict)
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
+        - tried it, failed miserably (needs grad to be computed or smth)
     - [x] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
     - [x] output prediction probability (useful if we make webapp)
     - [ ] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)

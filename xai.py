@@ -179,13 +179,14 @@ def get_gradcam_mapper(model, target_layers, mapper="ac") :
         am = AblationCAM(model=model, target_layers=target_layers)
 
     def image_mapper(image):
+        image.to(device)
         grayscale_am = am(
             input_tensor=image.unsqueeze(0),
             targets=[ClassifierOutputTarget(0)],
         )[0]
 
         return show_cam_on_image(
-            image.permute(1, 2, 0).numpy(),
+            image.permute(1, 2, 0).cpu().numpy(),
             grayscale_am,
             use_rgb=True,
         )
