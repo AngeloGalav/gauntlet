@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, random_split, Subset
 from typing import List, Tuple
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 
 class CIFAKEDataset(Dataset):
@@ -185,3 +186,14 @@ def train_test_split(split_ratio, dataset, isRandom=False):
 
         return train_dataset, test_dataset
 
+def show_random_sample(dataloader):
+    data_iter = iter(dataloader)
+    images, labels = next(data_iter)  # Fetch a random batch
+
+    # Display the first image in the batch
+    img = images[0].permute(1, 2, 0)  # Change dimensions for display
+    label = labels[0].item()  # Get label for the first image
+
+    plt.imshow(img)
+    plt.title(f"Label: {label}")
+    plt.show()
