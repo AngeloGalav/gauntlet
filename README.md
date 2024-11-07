@@ -1,4 +1,9 @@
 # gauntlet
+
+<p align="center">
+  <img src="res//image.png" alt="Data Thanos" width="400px"/>
+</p>
+
 > _"I used the AI to destroy the AI"_
 \- Thanos if he was a data scientist
 
