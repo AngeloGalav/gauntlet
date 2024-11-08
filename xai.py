@@ -1,28 +1,16 @@
-# scripts for xai stuff
+import torch
+import torchvision.transforms as transforms
+from lime import lime_image
+from skimage.segmentation import mark_boundaries
 import matplotlib.pyplot as plt
-from PIL import Image
-import torch.nn as nn
+import math
 import numpy as np
-import os, json
-from tqdm import tqdm
-
-import torch
-import torch.nn.functional as F
-from lime import lime_image
-from skimage.segmentation import mark_boundaries
-import matplotlib.pyplot as plt
-import torch
-from lime import lime_image
-from skimage.segmentation import mark_boundaries
-import matplotlib.pyplot as plt
 
 from pytorch_grad_cam import AblationCAM, ScoreCAM, GradCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
-import torchvision.transforms as transforms
 import os
 import io
-from PIL import Image
 
 device = 'cuda'
 save_results=True
@@ -263,7 +251,6 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
 
         image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
         fig, ax = plt.subplots(figsize=(6, 6))
-        image_dev = invert_normalization(image_dev)
 
         gradcam_image = image_mapper(image_dev)
         ax.imshow(gradcam_image)
@@ -285,9 +272,6 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
         # move the buffer's position to the start
         buf.seek(0)
 
-        # # convert buffer to an image
-        # img = Image.open(buf)
-        # return img
         return buf
 
 
