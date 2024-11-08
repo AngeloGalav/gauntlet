@@ -4,24 +4,58 @@
     padding: 1em;
     justify-content: center;
     align-items: center;
-    gap: 1em;
+    gap: 0em;
     display: grid;
     grid-template-rows: 1fr 1fr;
     color: white;
+    max-height: 100vh;
+}
+
+.image-place {
+  max-width: 30vw;
+  max-height: 30vh;
+  width: auto;
+  height: auto;
+}
+
+.hide {
+  display:none;
 }
 
 .images-container {
+    margin-top: 1em;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto;
     gap: 3em;
 }
 
 .buttons-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 3em;
     margin: auto;
+    margin-top: 3em;
 }
+
+.xai-radio {
+  
+}
+
+.server-status {
+  font-family: monospace;
+  color: greenyellow;
+  text-shadow: rgb(45, 255, 26) 1px 0 10px;
+}
+
+.server-status-red {
+  color: red;
+  text-shadow: rgb(224, 16, 16) 1px 0 10px;
+}
+
+.server-status-yellow {
+  color: yellow
+}
+
 
 
 .font-cool {
@@ -55,4 +89,28 @@
     box-shadow: none;
     opacity: 80%;
   }
-  
+
+
+  /* HTML: <div class="loader"></div> */
+.loader {
+  margin: auto;
+  width: fit-content;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 30px;
+  background: radial-gradient(circle closest-side,#000 94%,#0000) right/calc(200% - 1em) 100%;
+  animation: l24 1s infinite alternate linear;
+}
+.loader::before {
+  content: "Scanning image...";
+  line-height: 1em;
+  color: #0000;
+  background: inherit;
+  background-image: radial-gradient(circle closest-side,#fff 94%,#000);
+  -webkit-background-clip:text;
+          background-clip:text;
+}
+
+@keyframes l24{
+  100%{background-position: left}
+}

@@ -30,18 +30,24 @@ Place the respective datasets folders in the data folder:
 
 - [ ] webapp frontend
     - [ ] dynamic model selection
-    - [ ] fix position of images/buttons (make them "stay put") (optional)
-    - [ ] add code for upload to webapp server
-    - [ ] fix image sizes
+    - [x] fix position of images/buttons (make them "stay put") (optional)
+    - [x] add code for upload to webapp server
+    - [x] fix image sizes
     - [ ] add radio buttons for lime/gradcam
-    - [ ] add checkbox to visualize all layers or just last layer of resnet
     - [ ] add input for server address
-    - [ ] hide incoming image from server w/ loading animation until server response
+    - [x] hide incoming image from server w/ loading animation until server response
     - [ ] error handling
+        - [ ] handle server status
+    - [ ] add a "resolution" slider (selects layers of gradcam)
+    - [ ] (VERY OPTIONAL) display server console output on frontend
+    - [ ] server url stuff
+    - [ ] working server status
 
 - [ ] webapp server
     - [x] create tester app
-    - [ ] create gradcam func for single image
+    - [x] create gradcam func for single image
+    - [ ] select model stuff
+    - [ ] select backend stuff
 
 - [ ] Misc
     - [ ] Add text for various explanations

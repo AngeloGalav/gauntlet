@@ -260,7 +260,7 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
         fake_prob = probability * 100
         real_prob = (1 - probability) * 100
         fig.suptitle(f"Predicted: {predicted}\n"
-                     f"Fake Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
+                     f"AI Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
                      x=0.5, y=0.95, ha="center", fontsize=12)
         plt.axis("off")
         
