@@ -15,49 +15,38 @@ Place the respective datasets folders in the data folder:
 - RealVsAiArt contents into RealVsAiArt folder
 
 ## TODOs
-- [x] Create some models
+- [ ] Leftover models stuff
     - [ ] test standard CNN
-    - [x] Fine-tuned resnet
-    - [x] Implement confusion matrix code
-    - [x] Use mixed data model
     - [ ] Implement data augmentation in Mixed model (maybe turn data augmentation dataset creation step into a function?)
-- [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
-- [x] test models
+
 - [ ] do Xai stuff
-    - [x] find a method for XAI (LIME?)
-    - [x] fix LIME (batch_predict)
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
         - tried it, failed miserably (needs grad to be computed or smth)
-    - [x] save gradcam/lime result (i.e. outputs/model_name/grad_cam/CIFAKE or outputs/model_name/lime/RVAA etc...)
-    - [x] output prediction probability (useful if we make webapp)
     - [ ] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
     - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
-    - [ ] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
-- [x] Plotting
-    - [x] f1, precision, recall graphs
-    - [x] update LIME function to show predicted/label etc...
-- [x] better Finetuning of resnet50 (fine tune feature extractor after finetuning classifier)
-- [x] test with new image dataset
-    - [x] Add transformation pipeline
-    - [x] Add code for new image
-    - [x] fix data augmentation
-- [x] Misc
-    - [x] save graph and data (e.g. csv) to files for easier comparison
-        - [x] Fix report.txt bug (sometimes it does not get saved??? also there's on in outputs/report...)
-    - [x] add display mode (meaning, add a boolean/var so that it can be set to off or on when displaying plots on the notebook, so that the notebook is not cluttered, at least not in this phase of dev)
-    - [ ] Add text for various explanations
-    - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
+    - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
+    - [ ] extend webapp_gradcam function to work with lime as well
 
-- [ ] webapp fronted
-    - [ ] add loading animation
+- [ ] webapp frontend
     - [ ] dynamic model selection
     - [ ] fix position of images/buttons (make them "stay put") (optional)
     - [ ] add code for upload to webapp server
     - [ ] fix image sizes
+    - [ ] add radio buttons for lime/gradcam
+    - [ ] add checkbox to visualize all layers or just last layer of resnet
+    - [ ] add input for server address
+    - [ ] hide incoming image from server w/ loading animation until server response
+    - [ ] error handling
+
 - [ ] webapp server
     - [x] create tester app
     - [ ] create gradcam func for single image
+
+- [ ] Misc
+    - [ ] Add text for various explanations
+    - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
+
 
 ## Data
 https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download

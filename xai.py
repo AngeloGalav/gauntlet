@@ -1,29 +1,18 @@
 # scripts for xai stuff
+from skimage.segmentation import mark_boundaries
 import matplotlib.pyplot as plt
-from PIL import Image
-import torch.nn as nn
-import numpy as np
-import os, json
-from tqdm import tqdm
-
 import torch
-import torch.nn.functional as F
 from lime import lime_image
 from skimage.segmentation import mark_boundaries
 import matplotlib.pyplot as plt
-import numpy as np
-
-import torch
-import torch.nn.functional as F
-from lime import lime_image
-from skimage.segmentation import mark_boundaries
-import matplotlib.pyplot as plt
-import numpy as np
 
 from pytorch_grad_cam import AblationCAM, ScoreCAM, GradCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 import torchvision.transforms as transforms
+import os
+import io
+from PIL import Image
 
 device = 'cuda'
 save_results=True
@@ -128,6 +117,7 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
             # Get raw model output
             raw_output = model(images_dev)
             probabilities = torch.sigmoid(raw_output)
+
             predictions = (probabilities > 0.5).float()
             
             image = images[index]
@@ -236,6 +226,48 @@ def invert_normalization(tensor):
     tensor = inv_normalize(tensor)
 
     return tensor
+
+# TODO: change it so that it is compatible with lime as well with a single function
+def webapp_gradcam(image, model, target_layers, mapper="sc"):
+    global device
+    model.eval()
+    with torch.no_grad():
+        image_dev = image.to(device)
+        # add batch dimension for single image compat
+        numpy_image = image_dev.unsqueeze(0)
+        raw_output = model(numpy_image)
+
+        probabilities = torch.sigmoid(raw_output)
+        probability = probabilities.item()
+
+        image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
+        fig, ax = plt.subplots(figsize=(6, 6))
+        image_dev = invert_normalization(image_dev)
+
+        gradcam_image = image_mapper(image_dev)
+        ax.imshow(gradcam_image)
+
+        # pretty title stuff
+        predicted = "AI GENERATED" if probability > 0.5 else "REAL"
+        fake_prob = probability * 100
+        real_prob = (1 - probability) * 100
+        fig.suptitle(f"Predicted: {predicted}\n"
+                     f"Fake Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
+                     x=0.5, y=0.95, ha="center", fontsize=12)
+        plt.axis("off")
+        
+        # save image to buffer
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        plt.close(fig)  # close the figure to avoid displaying it in Jupyter
+
+        # move the buffer's position to the start
+        buf.seek(0)
+
+        # # convert buffer to an image
+        # img = Image.open(buf)
+        # return img
+        return buf
 
 
 # def show_batches(
