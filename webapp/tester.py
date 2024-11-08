@@ -1,5 +1,3 @@
-# TODO: remove after testing
-
 import requests
 
 # server url
