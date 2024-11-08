@@ -1,4 +1,14 @@
 # scripts for xai stuff
+import matplotlib.pyplot as plt
+from PIL import Image
+import torch.nn as nn
+import numpy as np
+import os, json
+from tqdm import tqdm
+
+import torch
+import torch.nn.functional as F
+from lime import lime_image
 from skimage.segmentation import mark_boundaries
 import matplotlib.pyplot as plt
 import torch
@@ -169,14 +179,16 @@ def get_gradcam_mapper(model, target_layers, mapper="ac") :
         am = AblationCAM(model=model, target_layers=target_layers)
 
     def image_mapper(image):
-        image.to(device)
+        image = invert_normalization(image)
+        image = image.to(device)
+        image_np = image.permute(1, 2, 0).cpu().numpy().astype(np.float32)
         grayscale_am = am(
             input_tensor=image.unsqueeze(0),
             targets=[ClassifierOutputTarget(0)],
         )[0]
 
         return show_cam_on_image(
-            image.permute(1, 2, 0).cpu().numpy(),
+            image_np / np.max(image_np),
             grayscale_am,
             use_rgb=True,
         )
@@ -191,7 +203,9 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_lab
 
     image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
 
-    nrows = (batch_size // columns)
+    columns = math.ceil(math.sqrt(batch_size))
+    nrows = math.ceil(batch_size / columns)
+
     batch_index = -1
 
     for images, labels in dataloader:
@@ -207,11 +221,18 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_lab
             plt.axis("off")
 
             if show_label:
-                plt.title(label)
+                label_title = "REAL" if label == 0 else "FAKE"
+                plt.title(label_title)
 
             plt.imshow(image_mapper(image))
 
-        plt.show()
+        # TODO: create a suitable dir to save stuff
+        if not os.path.exists(f'TEMP'):
+            os.makedirs(f'TEMP')
+
+        plt.savefig(f"TEMP/gradCam_batch_{batch_index}.png", bbox_inches='tight')
+        plt.close()
+        #plt.show()
 
         print(f"Visualized batch #{batch_index + 1}!")
         break # shows a single batch for now
