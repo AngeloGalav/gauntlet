@@ -21,7 +21,6 @@ Place the respective datasets folders in the data folder:
     - [x] Implement confusion matrix code
     - [x] Use mixed data model
     - [ ] Implement data augmentation in Mixed model (maybe turn data augmentation dataset creation step into a function?)
-    - [ ] Fix Mixed Dataset model (accuracy stuck at 34.5%)
 - [x] Rewrite to FTModel class to avoid call of model.model (using only single model instead)
 - [x] test models
 - [ ] do Xai stuff
@@ -51,10 +50,11 @@ Place the respective datasets folders in the data folder:
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
 - [ ] webapp fronted
-    - [ ] create frontend
-    - [ ] create dropdown menu with models
-    - [ ] image input
-    - [ ] display image output
+    - [ ] add loading animation
+    - [ ] dynamic model selection
+    - [ ] fix position of images/buttons (make them "stay put") (optional)
+    - [ ] add code for upload to webapp server
+    - [ ] fix image sizes
 - [ ] webapp server
     - [x] create tester app
     - [ ] create gradcam func for single image

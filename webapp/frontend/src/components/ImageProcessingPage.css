@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Gloock&family=Lexend:wght@100..900&family=Pontano+Sans:wght@300..700&display=swap');
+
+.page-container {
+    padding: 1em;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    color: white;
+}
+
+.images-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3em;
+}
+
+.buttons-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3em;
+    margin: auto;
+}
+
+
+.font-cool {
+    font-family: "Pontano Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* From Uiverse.io by virus231 */ 
+.button {
+    background: linear-gradient(140.14deg, #ec540e 15.05%, #d6361f 114.99%)
+        padding-box,
+      linear-gradient(142.51deg, #ff9465 8.65%, #af1905 88.82%) border-box;
+    border-radius: 7px;
+    border: 2px solid transparent;
+  
+    text-shadow: 1px 1px 1px #00000040;
+    box-shadow: 8px 8px 20px 0px #45090059;
+  
+    padding: 10px 20px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .button:hover {
+    box-shadow: none;
+    opacity: 80%;
+  }
+  
