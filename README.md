@@ -23,7 +23,7 @@ Place the respective datasets folders in the data folder:
     - [ ] try CAPTUM? (https://captum.ai/)
     - [ ] Combining Grad-CAM with Guided Backpropagation (?)
         - tried it, failed miserably (needs grad to be computed or smth)
-    - [ ] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
+    - [x] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
     - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
     - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
     - [ ] extend webapp_gradcam function to work with lime as well

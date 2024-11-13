@@ -43,7 +43,7 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
     with torch.no_grad():
         for images, labels in dataloader:
             # Select the first image in the batch
-
+            print(images.shape)
             images_dev  = images.to(device)
             pred = model(images_dev)
             probabilities = torch.sigmoid(pred)
@@ -105,13 +105,68 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
 
             break  # Only run for the first batch
 
+
+def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, batches_to_show = 1, show_label=True, columns=32, img_size=2):
+    model.eval()
+
+    columns = math.ceil(math.sqrt(batch_size))
+    nrows = math.ceil(batch_size / columns)
+
+    batch_index = 0
+
+    if not os.path.exists(f'outputs/{model_name}/lime/{dataset_name}/batch_visualization'):
+        os.makedirs(f'outputs/{model_name}/lime/{dataset_name}/batch_visualization')
+
+    with torch.no_grad():
+        for images, labels in dataloader:
+            batch_index += 1
+
+            # place data in correct channels
+            
+            plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
+
+            # loop for each image in the batch
+            for i, (image, label) in enumerate(zip(images, labels)):
+                numpy_image = image.permute(1, 2, 0).cpu().numpy()
+                # Initialize LIME Image Explainer
+                explainer = lime_image.LimeImageExplainer()
+                explanation = explainer.explain_instance(
+                    numpy_image,  # Image as numpy array
+                    lambda x: batch_predict(x, model),  # Prediction function
+                )
+
+                # Get the image and mask for the top predicted class
+                img, mask = explanation.get_image_and_mask(
+                    explanation.top_labels[0],
+                    positive_only=False,
+                    hide_rest=True
+                )
+                mask_img = mark_boundaries(img, mask, color=(0,0,1))
+                plt.subplot(nrows, columns, i + 1)
+                plt.axis("off")
+                if show_label:
+                    label_title = "REAL" if label == 0 else "FAKE"
+                    plt.title(label_title)
+
+                plt.imshow(mask_img)
+
+            plt.savefig(f"outputs/{model_name}/lime/{dataset_name}/batch_visualization/lime_batch_{batch_index}.png", bbox_inches='tight')
+            plt.close()
+
+            print(f"Visualized batch #{batch_index}!")
+            
+                # stop visualization at the given batch
+            if batches_to_show == batch_index:
+                break
+
+
 def explain_gradcam_single_image(dataloader, model, target_layers, model_name=None, dataset_name=None, index=0, mapper="ac"):
     global device
     model.eval()
     with torch.no_grad():
         for images, labels in dataloader:
             images_dev = images.to(device)
-
+    
             # Get raw model output
             raw_output = model(images_dev)
             probabilities = torch.sigmoid(raw_output)
@@ -184,7 +239,7 @@ def get_gradcam_mapper(model, target_layers, mapper="ac") :
     return image_mapper
 
 
-def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_label=True, columns=32, img_size=2, mapper="ac"):
+def explain_gradcam_batch(dataloader, batch_size, model, target_layers, model_name, dataset_name, batches_to_show = 1, show_label=True, columns=32, img_size=2, mapper="ac"):
     # N.B.: AblationCAM and ScoreCAM have batched implementations.
     # so it should be easy to transfer the batch representation to them.
     model.eval()
@@ -194,7 +249,7 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_lab
     columns = math.ceil(math.sqrt(batch_size))
     nrows = math.ceil(batch_size / columns)
 
-    batch_index = -1
+    batch_index = 0
 
     for images, labels in dataloader:
         batch_index += 1
@@ -207,23 +262,24 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, show_lab
         for i, (image, label) in enumerate(zip(images, labels)):
             plt.subplot(nrows, columns, i + 1)
             plt.axis("off")
-
             if show_label:
                 label_title = "REAL" if label == 0 else "FAKE"
                 plt.title(label_title)
 
             plt.imshow(image_mapper(image))
 
-        # TODO: create a suitable dir to save stuff
-        if not os.path.exists(f'TEMP'):
-            os.makedirs(f'TEMP')
+        if not os.path.exists(f'outputs/{model_name}/grad_cam/{dataset_name}/batch_visualization/{mapper}'):
+            os.makedirs(f'outputs/{model_name}/grad_cam/{dataset_name}/batch_visualization/{mapper}')
 
-        plt.savefig(f"TEMP/gradCam_batch_{batch_index}.png", bbox_inches='tight')
+        plt.savefig(f"outputs/{model_name}/grad_cam/{dataset_name}/batch_visualization/{mapper}/gradCam_batch_{batch_index}.png", bbox_inches='tight')
         plt.close()
         #plt.show()
 
-        print(f"Visualized batch #{batch_index + 1}!")
-        break # shows a single batch for now
+        print(f"Visualized batch #{batch_index}!")
+        
+        # stop visualization at the given batch
+        if batches_to_show == batch_index:
+            break
 
 def invert_normalization(tensor):
     mean = [0.485, 0.456, 0.406]
