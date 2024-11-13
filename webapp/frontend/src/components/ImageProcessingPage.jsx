@@ -13,7 +13,7 @@ function ImageProcessingPage() {
   const [isLoading, setIsLoading] = useState(false);  // Loading state
   const [serverURL, setServerURL] = useState("http://localhost:5000");
   const [selectedBackend, setSelectedBackend] = useState("ScoreCAM");
-  const [models, setModels] = useState([{name : "Loading models"}]);
+  const [models, setModels] = useState([]);
 
    // Toast state
    const [toastMessage, setToastMessage] = useState("");
@@ -42,9 +42,11 @@ function ImageProcessingPage() {
   // Run fetchModels on component mount
   useEffect(() => {
     fetchModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleImageUpload = (e) => {
+    setIncomingImage(null)
     const file = e.target.files[0];
     if (file) {
       setLoadedImage(file);
@@ -90,6 +92,7 @@ function ImageProcessingPage() {
         setToastVariant("error");
         setIsLoading(false);
         setShowToast(true)
+        setIncomingImage(null)
       }
     } else {
       setToastMessage("Upload an image first!");
@@ -99,18 +102,19 @@ function ImageProcessingPage() {
   };
 
   return (
+    <>
+    <ToastNotification
+      show={showToast}
+      onClose={() => setShowToast(false)}
+      message={toastMessage}
+      variant={toastVariant}
+    />
     <div
     className="page-container"
     style={{ maxWidth: "", margin: "auto" }}
     >
 
       {/* Toast Notification */}
-      <ToastNotification
-        show={showToast}
-        onClose={() => setShowToast(false)}
-        message={toastMessage}
-        variant={toastVariant}
-      />
 
       <div className='images-container'>
       {/* Image Upload Section */}
@@ -134,7 +138,7 @@ function ImageProcessingPage() {
       {/* Incoming Image Display */}
       {(isLoading || incomingImage) &&
         (<div style={{ marginBottom: "20px" }}>
-          <h3 className='font-cool'>Model Output</h3>
+          <h3 className='font-cool text-center'>Model Output</h3>
           {(incomingImage && !isLoading) ? (
             <img
             src={incomingImage}
@@ -222,6 +226,7 @@ function ImageProcessingPage() {
 
     </div>
   </div>
+  </>
   );
 }
 

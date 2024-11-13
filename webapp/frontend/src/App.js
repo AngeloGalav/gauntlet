@@ -12,10 +12,6 @@ function App() {
     className='min-vh-90' style={{minHeight:"100%", maxWidth:"100%"}}
     >
       <ImageProcessingPage />
-
-
-
-
       <MyFooter />
     </div>
     </div>

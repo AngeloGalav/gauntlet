@@ -14,7 +14,7 @@ sys.path.append(parent_dir)
 # project specific library imports
 from data_utils import pad_to_square
 from model_utils import get_device
-from xai import webapp_gradcam
+from xai import webapp_gradcam, webapp_lime
 from flask_cors import CORS
 
 import time
@@ -100,13 +100,8 @@ def process_image():
     # header info
     model_name = request.headers.get('Model')
     backend = request.headers.get('Xai-Backend')
-    
 
     print(f"got model: {model_name}, backend: {backend}")
-
-    if model_name != default_model :
-        load_model(model_name)
-    
 
     # Apply the transformation
     image = transform(image)
@@ -120,11 +115,8 @@ def process_image():
                         target_layers=[model.layer2, model.layer3, model.layer4],
                         mapper=mapper)
     else:
-        print("LIME not implemented yet...")
-        image_result_buf = webapp_gradcam(image,
-                model,
-                target_layers=[model.layer2, model.layer3, model.layer4],
-                mapper="sc")
+        image_result_buf = webapp_lime(image,
+                model)
 
     return send_file(image_result_buf, mimetype='image/png')
 

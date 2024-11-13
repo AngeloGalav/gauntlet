@@ -23,7 +23,8 @@ Place the respective datasets folders in the data folder:
     - [x] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
     - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
     - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
-    - [ ] extend webapp_gradcam function to work with lime as well
+    - [x] extend webapp_gradcam function to work with lime as well
+    - check every function to confirm it work with the new setup
 
 - [ ] webapp frontend
     - [x] dynamic model selection
@@ -35,7 +36,6 @@ Place the respective datasets folders in the data folder:
     - [x] hide incoming image from server w/ loading animation until server response
     - [x] error handling
         - [x] handle server status
-    - [ ] add a "resolution" slider (selects layers of gradcam)
     - [x] server url stuff
     - [ ] Add about page? (EXTREMELY OPTIONAL)
 
@@ -44,9 +44,10 @@ Place the respective datasets folders in the data folder:
     - [x] create gradcam func for single image
     - [x] select model stuff
     - [x] select backend stuff
-    - [ ] select LIME backend on server (aka need a function like webapp_gradcam but for LIME)
+    - [x] select LIME backend on server (aka need a function like webapp_gradcam but for LIME)
 
 - [ ] Relazione
+    - [ ] understand what each lime color mean
     - [ ] read about current SoTA approaches (maybe implement some of the ideas they do?)
     - [ ] Introduction
         - [ ] Write a long ass introduction, it should include (the following tasks)
@@ -57,6 +58,8 @@ Place the respective datasets folders in the data folder:
     - [ ] do start script for webapp
     - [ ] Add text for various explanations
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
+
+- [ ] REWORK EVERYTHING SO THAT WE HAVE 2 OUTPUT NEURONS INSTEAD OF 1!!!!!!!!!
 
 
 ## Data

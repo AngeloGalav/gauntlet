@@ -52,13 +52,17 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
 
             # place data in correct channels
             numpy_image = image.permute(1, 2, 0).cpu().numpy()
-            
+
 
             # Initialize LIME Image Explainer
             explainer = lime_image.LimeImageExplainer()
             explanation = explainer.explain_instance(
                 numpy_image,  # Image as numpy array
                 lambda x: batch_predict(x, model),  # Prediction function
+                top_labels=1,
+                hide_color=0,
+                num_samples=1000,
+                random_seed=42  # Set a seed for reproducibility
             )
 
             # Get the image and mask for the top predicted class
@@ -67,7 +71,7 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
                 positive_only=False,
                 hide_rest=True
             )
-            
+
             probability = probabilities[index].item()  # Probability of being "fake"
             fake_prob = probability * 100
             real_prob = (1 - probability) * 100
@@ -95,7 +99,7 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
             fig.suptitle(f"Labelled {label}, Predicted {predicted}\n"
                         f"Fake Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
                         x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
-            
+
             if model_name != None and dataset_name != None:
                 if not os.path.exists(f'outputs/{model_name}/lime/{dataset_name}/'):
                     os.makedirs(f'outputs/{model_name}/lime/{dataset_name}/')
@@ -122,7 +126,7 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
             batch_index += 1
 
             # place data in correct channels
-            
+
             plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
 
             # loop for each image in the batch
@@ -133,6 +137,10 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
                 explanation = explainer.explain_instance(
                     numpy_image,  # Image as numpy array
                     lambda x: batch_predict(x, model),  # Prediction function
+                    top_labels=1,
+                    hide_color=0,
+                    num_samples=1000,
+                    random_seed=42  # Set a seed for reproducibility
                 )
 
                 # Get the image and mask for the top predicted class
@@ -154,7 +162,7 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
             plt.close()
 
             print(f"Visualized batch #{batch_index}!")
-            
+
                 # stop visualization at the given batch
             if batches_to_show == batch_index:
                 break
@@ -166,17 +174,17 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
     with torch.no_grad():
         for images, labels in dataloader:
             images_dev = images.to(device)
-    
+
             # Get raw model output
             raw_output = model(images_dev)
             probabilities = torch.sigmoid(raw_output)
 
             predictions = (probabilities > 0.5).float()
-            
+
             image = images[index]
             probability = probabilities[index].item()
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
-            
+
             # Setup for GradCAM
             image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
@@ -225,6 +233,7 @@ def get_gradcam_mapper(model, target_layers, mapper="ac") :
         image = invert_normalization(image)
         image = image.to(device)
         image_np = image.permute(1, 2, 0).cpu().numpy().astype(np.float32)
+        # create grayscale activation map
         grayscale_am = am(
             input_tensor=image.unsqueeze(0),
             targets=[ClassifierOutputTarget(0)],
@@ -276,7 +285,7 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, model_na
         #plt.show()
 
         print(f"Visualized batch #{batch_index}!")
-        
+
         # stop visualization at the given batch
         if batches_to_show == batch_index:
             break
@@ -292,8 +301,77 @@ def invert_normalization(tensor):
 
     return tensor
 
-# TODO: change it so that it is compatible with lime as well with a single function
+def webapp_lime(image, model):
+    global device
+    model.eval()
+    with torch.no_grad():
+        image_dev = image.to(device)
+        # add batch dimension
+        numpy_image = image_dev.unsqueeze(0)
+
+        raw_output = model(numpy_image)
+        probabilities = torch.sigmoid(raw_output)
+        probability = probabilities.item()
+
+        explainer = lime_image.LimeImageExplainer()
+        explanation = explainer.explain_instance(
+            invert_normalization(image).permute(1, 2, 0).cpu().numpy(),
+            lambda x: batch_predict(x, model),
+            top_labels=1,
+            num_samples=1000,
+            random_seed=42
+        )
+
+        # get the image and mask for the top predicted class
+        #TODO: understand what this img object is
+        img, mask = explanation.get_image_and_mask(
+            explanation.top_labels[0],
+            positive_only=False,
+            hide_rest=False
+        )
+
+        positive_regions = [region for region, weight in explanation.local_exp[explanation.top_labels[0]] if weight > 0]
+        negative_regions = [region for region, weight in explanation.local_exp[explanation.top_labels[0]] if weight <= -0.01]
+
+        original_image = invert_normalization(image).permute(1, 2, 0).cpu().numpy()
+        colored_image = original_image.copy()
+
+        # apply green for positive contributions and red for negative contributions
+        alpha = 0.5  # transparency level for the mask
+        for region in positive_regions:
+            colored_image[mask == region] = colored_image[mask == region] * (1 - alpha) + alpha * np.array([0, 1, 0])  # Green
+        for region in negative_regions:
+            colored_image[mask == region] = colored_image[mask == region] * (1 - alpha) + alpha * np.array([1, 0, 0])  # Red
+
+        # pretty print information for title
+        predicted = "AI GENERATED" if probability > 0.5 else "REAL"
+        fake_prob = probability * 100
+        real_prob = (1 - probability) * 100
+
+        # plot only the image with the colored mask applied on the original background
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        # display the original image with the colored mask
+        ax.imshow(colored_image)
+        ax.set_title(f"Predicted: {predicted}\n"
+                     f"AI Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
+                     fontsize=12)
+        ax.axis("off")
+
+        # save image to buffer
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight')
+        plt.close(fig)  # close the figure to avoid display issues in Jupyter
+
+        # move the buffer's position to the start
+        buf.seek(0)
+
+        return buf
+
 def webapp_gradcam(image, model, target_layers, mapper="sc"):
+    """
+    Executes gradcam on a single image, and returns a buffer
+    """
     global device
     model.eval()
     with torch.no_grad():
@@ -319,7 +397,7 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
                      f"AI Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
                      x=0.5, y=0.95, ha="center", fontsize=12)
         plt.axis("off")
-        
+
         # save image to buffer
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
@@ -329,37 +407,3 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
         buf.seek(0)
 
         return buf
-
-
-# def show_batches(
-#     dataloader,
-#     batch_size,
-#     image_mapper=lambda image: image.permute(1, 2, 0),
-#     show_label=True,
-#     batch_indices=lambda data_loader: [0, len(data_loader) - 2],
-#     columns=32,
-#     img_size=2
-# ):
-#     nrows = (batch_size // columns)
-#     batch_index = -1
-
-#     for images, labels in dataloader:
-#         batch_index += 1
-
-#         plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
-
-#         if show_label:
-#             plt.subplots_adjust(hspace=0.6)
-
-#         for i, (image, label) in enumerate(zip(images, labels)):
-#             plt.subplot(nrows, columns, i + 1)
-#             plt.axis("off")
-
-#             if show_label:
-#                 plt.title(label)
-
-#             plt.imshow(image_mapper(image))
-
-#         plt.show()
-
-#         print(f"Visualized batch #{batch_index + 1}!")
