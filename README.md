@@ -24,7 +24,7 @@ Place the respective datasets folders in the data folder:
     - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
     - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
     - [x] extend webapp_gradcam function to work with lime as well
-    - check every function to confirm it work with the new setup
+    - [ ] check every function to confirm it work with the new setup
 
 - [ ] webapp frontend
     - [x] dynamic model selection
@@ -38,6 +38,7 @@ Place the respective datasets folders in the data folder:
         - [x] handle server status
     - [x] server url stuff
     - [ ] Add about page? (EXTREMELY OPTIONAL)
+    - [x] add cute lil rotate animation
 
 - [ ] webapp server
     - [x] create tester app

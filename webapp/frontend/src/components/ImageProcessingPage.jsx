@@ -14,6 +14,15 @@ function ImageProcessingPage() {
   const [serverURL, setServerURL] = useState("http://localhost:5000");
   const [selectedBackend, setSelectedBackend] = useState("ScoreCAM");
   const [models, setModels] = useState([]);
+  const [isRotating, setIsRotating] = useState(false);
+
+  const handleIconClick = () => {
+    setIsRotating(true);
+    fetchModels();
+
+    // Remove the rotation class after 2 seconds
+    setTimeout(() => setIsRotating(false), 2000);
+  };
 
    // Toast state
    const [toastMessage, setToastMessage] = useState("");
@@ -173,7 +182,11 @@ function ImageProcessingPage() {
 
     {/* server input */}
     <div>
-    <h3 className='font-cool'>Server URL <span onClick={fetchModels} style={{ cursor: 'pointer' }}><BiRefresh /></span></h3>
+    <h3 className='font-cool'>Server URL <span
+      onClick={handleIconClick}
+      style={{ cursor: 'pointer' }}>
+      <BiRefresh className={isRotating ? 'rotate-icon rotate-icon-active' : 'rotate-icon'}
+      /></span></h3>
     <form>
       <div className="form-group">
         <input className="form-control" 

@@ -54,6 +54,23 @@
   color: yellow
 }
 
+/* refersh rotation animation */
+@keyframes rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.rotate-icon {
+  display: inline-block;
+}
+
+.rotate-icon-active {
+  animation: rotate 2s;
+}
 
 
 .font-cool {
