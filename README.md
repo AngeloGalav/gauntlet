@@ -24,7 +24,7 @@ Place the respective datasets folders in the data folder:
     - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
     - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
     - [x] extend webapp_gradcam function to work with lime as well
-    - [ ] check every function to confirm it work with the new setup
+    - [x] check every function to confirm it work with the new setup
     - [ ] IMPORTANT!!! FIX LABEL TITLE IN GRADCAM/LIME BATCH (SET PREDICTION TITLE INSTEAD OF DATALOADER TITLE) AND ADD COLOR DEPENDING ON THE CORRECTNESS OF PREDICTION!!!
 
 - [ ] webapp frontend
@@ -56,15 +56,19 @@ Place the respective datasets folders in the data folder:
         - [ ] description of the problem, why is it useful (maybe statistics of internet scammed people estimate etc)
         - [ ] description of some SoTA approaches and how they work
 
+- [ ] Testing
+    - [ ] RVAA beefy testing, tends to predict images as FAKE too much, and its gradcam is broken too.
+    - [ ] Run Mixed notebook too and test it with the webapp
+
 - [ ] Notebooks
-    - [ ] Fix notebooks for the final consegna
+    - [ ] Beautify notebooks for the final consegna
 
 - [ ] Misc
-    - [ ] do start script for webapp
+    - [x] do start script for webapp
     - [ ] Add text for various explanations
     - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
 
-- [ ] REWORK EVERYTHING SO THAT WE HAVE 2 OUTPUT NEURONS INSTEAD OF 1!!!!!!!!!
+- [x] REWORK EVERYTHING SO THAT WE HAVE 2 OUTPUT NEURONS INSTEAD OF 1!!!!!!!!!
 
 
 ## Data
