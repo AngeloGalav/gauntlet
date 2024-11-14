@@ -79,7 +79,7 @@ def prepare_for_ft(model, num_classes=2) -> None:
 
 # modified resnet with more fc
 class ModifiedResNet(nn.Module):
-    def __init__(self, original_resnet, use_dropout=False, num_classes=1, hidden_size1=1024, hidden_size2=512):
+    def __init__(self, original_resnet, use_dropout=False, num_classes=2, hidden_size1=1024, hidden_size2=512):
         super(ModifiedResNet, self).__init__()
 
         # Use the original ResNet up to the global average pooling layer
