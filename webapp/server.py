@@ -19,13 +19,19 @@ from flask_cors import CORS
 
 import time
 
+print("Server is starting...")
+
+app = Flask(__name__)
+CORS(app) # Enable CORS for all routes
+
 # non-interactive backend
 matplotlib.use('Agg')
 
 # setup stuff
 device = get_device()
+current_model = "RVAA_FTRes50"
 model = resnet50(weights='IMAGENET1K_V1')
-model.fc = nn.Linear(model.fc.in_features, 1)
+model.fc = nn.Linear(model.fc.in_features, 2)
 
 # transformation pipeline
 IMG_SIZE = 224
@@ -39,7 +45,6 @@ transform = transforms.Compose([
 ])
 
 
-# TODO: change it so it can be changed on request
 def load_model(model_name):
     print(f"Loading model {model_name}")
     weight_path = f"checkpoints/best_{model_name}.pth"
@@ -58,13 +63,7 @@ def load_model(model_name):
     print(f"Model loaded in {duration} seconds")
     print(f'Model {model_name} is ready.')
 
-default_model = "RVAA_FTRes50"
-load_model(default_model)
-
-print("Server is starting...")
-
-app = Flask(__name__)
-CORS(app) # Enable CORS for all routes
+load_model(current_model)
 
 # had to write this endpoint bc of react...
 @app.route('/get-models', methods=['GET'])
@@ -90,6 +89,7 @@ def get_models():
 
 @app.route('/process-image', methods=['POST'])
 def process_image():
+    global current_model
     if 'image' not in request.files:
         return jsonify({"error": "No image file found in request"}), 400
 
@@ -107,9 +107,12 @@ def process_image():
     image = transform(image)
     image = image.to(device)
 
+    if model_name != current_model :
+        current_model = model_name
+        load_model(model_name)
+
     if backend != "LIME":
         mapper = "ac" if backend == "AblationCAM" else "sc"
-        print(f"using mapper {mapper}")
         image_result_buf = webapp_gradcam(image,
                         model,
                         target_layers=[model.layer2, model.layer3, model.layer4],

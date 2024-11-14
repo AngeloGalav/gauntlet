@@ -180,9 +180,11 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         X = X.to(device)
         y = y.to(device)
         # Compute prediction and loss (fw)
-        pred = model(X)
-        y = y.unsqueeze(1)
-        loss = loss_fn(pred, y.float())
+        pred_logits = model(X)
+
+        # we use one hot encoding only for loss computation
+        y_one_hot = torch.nn.functional.one_hot(y, num_classes=2).float()
+        loss = loss_fn(pred_logits, y_one_hot.float())
         # Zero the gradients (to prevent gradient accomulation)
         optimizer.zero_grad()
 
@@ -190,8 +192,9 @@ def train_loop(dataloader, model, loss_fn, optimizer, batch_size, device):
         loss.backward()
         optimizer.step()
 
-        probabilities = torch.sigmoid(pred)
-        predictions = (probabilities > 0.5).float()
+        # Calculate probabilities and predictions for two output neurons
+        probabilities = torch.softmax(pred_logits, dim=1)
+        predictions = torch.argmax(probabilities, dim=1)  # choose the neuron with higher probability
 
         correct += (predictions == y).float().sum()
 
@@ -253,12 +256,13 @@ def test(dataloader, model, loss_fn, device, validation:bool=False, model_name:s
         for X, y in dataloader:
             X = X.to(device)
             y = y.to(device)
-            logits = model(X)
-            y = y.unsqueeze(1)
-            test_loss += loss_fn(logits, y.float()).item()
+            pred_logits = model(X)
+            # y = y.unsqueeze(1)
+            y_one_hot = torch.nn.functional.one_hot(y, num_classes=2).float()
+            test_loss += loss_fn(pred_logits, y_one_hot.float()).item()
 
-            probabilities = torch.sigmoid(logits)
-            predictions = (probabilities > 0.5).float()
+            probabilities = torch.softmax(pred_logits, dim=1)
+            predictions = torch.argmax(probabilities, dim=1)
             correct += (predictions == y).float().sum()
 
             total_predictions.extend(predictions.detach().cpu().numpy())

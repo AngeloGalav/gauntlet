@@ -137,9 +137,6 @@ function ImageProcessingPage() {
             className='image-place'
             alt="Uploaded Preview"
             />
-            <p>
-            Uploaded image: {loadedImage.name}
-            </p>
         </div>
         }
       </div>

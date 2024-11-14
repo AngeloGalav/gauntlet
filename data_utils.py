@@ -144,7 +144,7 @@ def pad_to_square(image):
     return transforms.functional.pad(image, padding, fill=0)  # Add padding with black (fill=0)
 
 # Does train/val/test split
-def train_test_split(split_ratio, dataset, isRandom=False):
+def train_test_split(split_ratio, dataset, isRandom=True):
     """
     Create dataset split to train and test, randomly.
     If the split is a tuple, it creates 3 splits of the dataset

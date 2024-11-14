@@ -43,15 +43,16 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
     with torch.no_grad():
         for images, labels in dataloader:
             # Select the first image in the batch
-            print(images.shape)
             images_dev  = images.to(device)
-            pred = model(images_dev)
-            probabilities = torch.sigmoid(pred)
-            predictions = (probabilities > 0.5).float()
+            pred_logits = model(images_dev)
+            
+            probabilities = torch.softmax(pred_logits, dim=1)
+            predictions = torch.argmax(probabilities, dim=1)
             image = images[index]
 
             # place data in correct channels
-            numpy_image = image.permute(1, 2, 0).cpu().numpy()
+            # invert_normalization removes warning
+            numpy_image = invert_normalization(image).permute(1, 2, 0).cpu().numpy()
 
 
             # Initialize LIME Image Explainer
@@ -59,22 +60,20 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
             explanation = explainer.explain_instance(
                 numpy_image,  # Image as numpy array
                 lambda x: batch_predict(x, model),  # Prediction function
-                top_labels=1,
-                hide_color=0,
                 num_samples=1000,
                 random_seed=42  # Set a seed for reproducibility
             )
 
             # Get the image and mask for the top predicted class
             img, mask = explanation.get_image_and_mask(
-                explanation.top_labels[0],
+                explanation.top_labels[0], # the top predicted class
                 positive_only=False,
-                hide_rest=True
             )
 
-            probability = probabilities[index].item()  # Probability of being "fake"
-            fake_prob = probability * 100
-            real_prob = (1 - probability) * 100
+            fake_probability = probabilities[index][1]  # Probability of being "fake"
+            real_probability = probabilities[index][0]
+            fake_prob = fake_probability * 100
+            real_prob = real_probability * 100
 
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
 
@@ -131,23 +130,22 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
 
             # loop for each image in the batch
             for i, (image, label) in enumerate(zip(images, labels)):
-                numpy_image = image.permute(1, 2, 0).cpu().numpy()
+                # inverting normalization to remove warning
+                numpy_image = (image).permute(1, 2, 0).cpu().numpy()
                 # Initialize LIME Image Explainer
                 explainer = lime_image.LimeImageExplainer()
                 explanation = explainer.explain_instance(
                     numpy_image,  # Image as numpy array
                     lambda x: batch_predict(x, model),  # Prediction function
-                    top_labels=1,
                     hide_color=0,
                     num_samples=1000,
-                    random_seed=42  # Set a seed for reproducibility
+                    random_seed=42,  # Set a seed for reproducibility
                 )
 
                 # Get the image and mask for the top predicted class
                 img, mask = explanation.get_image_and_mask(
                     explanation.top_labels[0],
                     positive_only=False,
-                    hide_rest=True
                 )
                 mask_img = mark_boundaries(img, mask, color=(0,0,1))
                 plt.subplot(nrows, columns, i + 1)
@@ -176,13 +174,13 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
             images_dev = images.to(device)
 
             # Get raw model output
-            raw_output = model(images_dev)
-            probabilities = torch.sigmoid(raw_output)
-
-            predictions = (probabilities > 0.5).float()
+            pred_logits = model(images_dev)
+            probabilities = torch.softmax(pred_logits, dim=1)
+            predictions = torch.argmax(probabilities, dim=1)
 
             image = images[index]
-            probability = probabilities[index].item()
+            fake_probability = probabilities[index][1] # prob of being fake
+            real_probability = probabilities[index][0]
             label, predicted, title_color = get_predicted_label(labels, predictions, index)
 
             # Setup for GradCAM
@@ -200,8 +198,8 @@ def explain_gradcam_single_image(dataloader, model, target_layers, model_name=No
             ax[1].set_title("GradCAM")
 
             # Show probability on the title
-            fake_prob = probability * 100
-            real_prob = (1 - probability) * 100
+            fake_prob = fake_probability * 100
+            real_prob = real_probability * 100
             fig.suptitle(f"Labelled: {label}, Predicted: {predicted}\n"
                          f"Fake Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
                          x=0.5, y=1.02, ha="center", fontsize=15, color=title_color)
@@ -236,7 +234,7 @@ def get_gradcam_mapper(model, target_layers, mapper="ac") :
         # create grayscale activation map
         grayscale_am = am(
             input_tensor=image.unsqueeze(0),
-            targets=[ClassifierOutputTarget(0)],
+            targets=None, # if it's none, the target its the highest scoring category
         )[0]
 
         return show_cam_on_image(
@@ -282,7 +280,6 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, model_na
 
         plt.savefig(f"outputs/{model_name}/grad_cam/{dataset_name}/batch_visualization/{mapper}/gradCam_batch_{batch_index}.png", bbox_inches='tight')
         plt.close()
-        #plt.show()
 
         print(f"Visualized batch #{batch_index}!")
 
@@ -309,15 +306,14 @@ def webapp_lime(image, model):
         # add batch dimension
         numpy_image = image_dev.unsqueeze(0)
 
-        raw_output = model(numpy_image)
-        probabilities = torch.sigmoid(raw_output)
-        probability = probabilities.item()
+        pred_logits = model(numpy_image)
+        probabilities = torch.softmax(pred_logits, dim=1)
+        predictions = torch.argmax(probabilities, dim=1)
 
         explainer = lime_image.LimeImageExplainer()
         explanation = explainer.explain_instance(
             invert_normalization(image).permute(1, 2, 0).cpu().numpy(),
             lambda x: batch_predict(x, model),
-            top_labels=1,
             num_samples=1000,
             random_seed=42
         )
@@ -330,8 +326,8 @@ def webapp_lime(image, model):
             hide_rest=False
         )
 
-        positive_regions = [region for region, weight in explanation.local_exp[explanation.top_labels[0]] if weight > 0]
-        negative_regions = [region for region, weight in explanation.local_exp[explanation.top_labels[0]] if weight <= -0.01]
+        positive_regions = [region for region, _ in explanation.local_exp[explanation.top_labels[0]]]
+        negative_regions = [region for region, _ in explanation.local_exp[explanation.top_labels[1]]]
 
         original_image = invert_normalization(image).permute(1, 2, 0).cpu().numpy()
         colored_image = original_image.copy()
@@ -344,9 +340,12 @@ def webapp_lime(image, model):
             colored_image[mask == region] = colored_image[mask == region] * (1 - alpha) + alpha * np.array([1, 0, 0])  # Red
 
         # pretty print information for title
-        predicted = "AI GENERATED" if probability > 0.5 else "REAL"
-        fake_prob = probability * 100
-        real_prob = (1 - probability) * 100
+        predicted = "AI GENERATED" if predictions == 1 else "REAL"
+        
+        fake_probability = probabilities[0][1] # prob of being fake
+        real_probability = probabilities[0][0]
+        fake_prob = fake_probability * 100
+        real_prob = real_probability * 100
 
         # plot only the image with the colored mask applied on the original background
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -378,10 +377,10 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
         image_dev = image.to(device)
         # add batch dimension for single image compat
         numpy_image = image_dev.unsqueeze(0)
-        raw_output = model(numpy_image)
+        pred_logits = model(numpy_image)
 
-        probabilities = torch.sigmoid(raw_output)
-        probability = probabilities.item()
+        probabilities = torch.softmax(pred_logits, dim=1)
+        predictions = torch.argmax(probabilities, dim=1)
 
         image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -389,10 +388,13 @@ def webapp_gradcam(image, model, target_layers, mapper="sc"):
         gradcam_image = image_mapper(image_dev)
         ax.imshow(gradcam_image)
 
+        fake_probability = probabilities[0][1] # prob of being fake
+        real_probability = probabilities[0][0]
+
         # pretty title stuff
-        predicted = "AI GENERATED" if probability > 0.5 else "REAL"
-        fake_prob = probability * 100
-        real_prob = (1 - probability) * 100
+        predicted = "AI GENERATED" if predictions == 1 else "REAL"
+        fake_prob = fake_probability * 100
+        real_prob = real_probability * 100
         fig.suptitle(f"Predicted: {predicted}\n"
                      f"AI Probability: {fake_prob:.2f}%, Real Probability: {real_prob:.2f}%",
                      x=0.5, y=0.95, ha="center", fontsize=12)

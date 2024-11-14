@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-cd webapp
 
 # start server first
-python server.py
+python webapp/server.py
 
 # start frontend second
+cd webapp
 cd frontend
 npm install
 npm start

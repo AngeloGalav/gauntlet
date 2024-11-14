@@ -1,12 +1,12 @@
 @echo off
 
 :: Navigate to the webapp directory
-cd webapp
 
 :: Start the Python server
-start "" python.exe server.py
+start "" python.exe webapp/server.py
 
 :: Navigate to the frontend directory
+cd webapp
 cd frontend
 
 :: Install npm packages

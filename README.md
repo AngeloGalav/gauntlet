@@ -25,6 +25,7 @@ Place the respective datasets folders in the data folder:
     - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
     - [x] extend webapp_gradcam function to work with lime as well
     - [ ] check every function to confirm it work with the new setup
+    - [ ] IMPORTANT!!! FIX LABEL TITLE IN GRADCAM/LIME BATCH (SET PREDICTION TITLE INSTEAD OF DATALOADER TITLE) AND ADD COLOR DEPENDING ON THE CORRECTNESS OF PREDICTION!!!
 
 - [ ] webapp frontend
     - [x] dynamic model selection
@@ -54,6 +55,9 @@ Place the respective datasets folders in the data folder:
         - [ ] Write a long ass introduction, it should include (the following tasks)
         - [ ] description of the problem, why is it useful (maybe statistics of internet scammed people estimate etc)
         - [ ] description of some SoTA approaches and how they work
+
+- [ ] Notebooks
+    - [ ] Fix notebooks for the final consegna
 
 - [ ] Misc
     - [ ] do start script for webapp
