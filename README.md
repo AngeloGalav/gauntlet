@@ -25,7 +25,7 @@ Place the respective datasets folders in the data folder:
     - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
     - [x] extend webapp_gradcam function to work with lime as well
     - [x] check every function to confirm it work with the new setup
-    - [ ] IMPORTANT!!! FIX LABEL TITLE IN GRADCAM/LIME BATCH (SET PREDICTION TITLE INSTEAD OF DATALOADER TITLE) AND ADD COLOR DEPENDING ON THE CORRECTNESS OF PREDICTION!!!
+    - [x] IMPORTANT!!! FIX LABEL TITLE IN GRADCAM/LIME BATCH (SET PREDICTION TITLE INSTEAD OF DATALOADER TITLE) AND ADD COLOR DEPENDING ON THE CORRECTNESS OF PREDICTION!!!
 
 - [ ] webapp frontend
     - [x] dynamic model selection

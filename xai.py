@@ -15,6 +15,17 @@ import io
 device = 'cuda'
 save_results=True
 
+BATCHSIZE_TO_COLUMNS = {1: 1,
+                        2: 2,
+                        4: 4,
+                        8: 4,
+                        16: 4,
+                        32: 4,
+                        64: 8,
+                        128: 16
+}
+
+
 def set_device(device_to_set):
     global device
     device = device_to_set
@@ -112,7 +123,7 @@ def explain_lime_single_image(dataloader, model, model_name=None, dataset_name=N
 def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, batches_to_show = 1, show_label=True, columns=32, img_size=2):
     model.eval()
 
-    columns = math.ceil(math.sqrt(batch_size))
+    columns = BATCHSIZE_TO_COLUMNS[batch_size]
     nrows = math.ceil(batch_size / columns)
 
     batch_index = 0
@@ -124,6 +135,11 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
         for images, labels in dataloader:
             batch_index += 1
 
+            images_dev  = images.to(device)
+            pred_logits = model(images_dev)
+            
+            probabilities = torch.softmax(pred_logits, dim=1)
+            predictions = torch.argmax(probabilities, dim=1)
             # place data in correct channels
 
             plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
@@ -131,6 +147,7 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
             # loop for each image in the batch
             for i, (image, label) in enumerate(zip(images, labels)):
                 # inverting normalization to remove warning
+                image = invert_normalization(image)
                 numpy_image = (image).permute(1, 2, 0).cpu().numpy()
                 # Initialize LIME Image Explainer
                 explainer = lime_image.LimeImageExplainer()
@@ -151,8 +168,8 @@ def explain_lime_batch(dataloader, batch_size, model, model_name, dataset_name, 
                 plt.subplot(nrows, columns, i + 1)
                 plt.axis("off")
                 if show_label:
-                    label_title = "REAL" if label == 0 else "FAKE"
-                    plt.title(label_title)
+                    _, predicted, title_color = get_predicted_label(labels, predictions, i)
+                    plt.title(f"PRED: {predicted}", color=title_color)
 
                 plt.imshow(mask_img)
 
@@ -253,12 +270,21 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, model_na
 
     image_mapper = get_gradcam_mapper(model, target_layers, mapper=mapper)
 
-    columns = math.ceil(math.sqrt(batch_size))
+    columns = BATCHSIZE_TO_COLUMNS[batch_size]
+    
     nrows = math.ceil(batch_size / columns)
 
     batch_index = 0
 
     for images, labels in dataloader:
+
+        images_dev = images.to(device)
+        # Get raw model output
+        pred_logits = model(images_dev)
+        probabilities = torch.softmax(pred_logits, dim=1)
+        predictions = torch.argmax(probabilities, dim=1)
+
+
         batch_index += 1
 
         plt.figure(figsize=(columns * img_size, nrows * img_size), dpi=300)
@@ -266,12 +292,12 @@ def explain_gradcam_batch(dataloader, batch_size, model, target_layers, model_na
         if show_label:
             plt.subplots_adjust(hspace=0.6)
 
-        for i, (image, label) in enumerate(zip(images, labels)):
+        for i, (image, _) in enumerate(zip(images, labels)):
             plt.subplot(nrows, columns, i + 1)
             plt.axis("off")
             if show_label:
-                label_title = "REAL" if label == 0 else "FAKE"
-                plt.title(label_title)
+                _, predicted, title_color = get_predicted_label(labels, predictions, i)
+                plt.title(f"PRED: {predicted}", color=title_color)
 
             plt.imshow(image_mapper(image))
 
