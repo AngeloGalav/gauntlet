@@ -37,7 +37,7 @@ def fix_random(seed: int) -> None:
 
 # TODO: test this model
 class CNN(nn.Module):
-    def __init__(self, num_classes=2):
+    def __init__(self, num_classes=2, input_width=224, input_height=224):
         super(CNN, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1)
@@ -50,7 +50,7 @@ class CNN(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         # fully connected layers (after flattening)
-        self.fc1 = nn.Linear(128 * 32 * 32 // 8, 512)  # Adjust based on input size
+        self.fc1 = nn.Linear(input_width*input_height*2, 512)  # Adjust based on input size
         self.fc2 = nn.Linear(512, 256)
         self.fc3 = nn.Linear(256, num_classes)
 
