@@ -16,8 +16,8 @@ Place the respective datasets folders in the data folder:
 
 ## TODOs
 - [ ] Leftover models stuff
-    - [ ] test standard CNN
-    - [ ] Implement data augmentation in Mixed model (maybe turn data augmentation dataset creation step into a function?)
+    - [x] test standard CNN
+    - [x] Implement data augmentation in Mixed model (maybe turn data augmentation dataset creation step into a function?)
 
 - [ ] do Xai stuff
     - [x] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
@@ -49,7 +49,7 @@ Place the respective datasets folders in the data folder:
     - [x] select LIME backend on server (aka need a function like webapp_gradcam but for LIME)
 
 - [ ] Relazione
-    - [ ] understand what each lime color mean
+    - [x] understand what each lime color mean (green -> areas that encourages top predictions, red -> the opposite)
     - [ ] read about current SoTA approaches (maybe implement some of the ideas they do?)
     - [ ] Introduction
         - [ ] Write a long ass introduction, it should include (the following tasks)

@@ -7,6 +7,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
+import xai
 
 class CIFAKEDataset(Dataset):
     def __init__(self, root_dir, split="train", transform=None):
@@ -190,8 +191,9 @@ def show_random_sample(dataloader):
     data_iter = iter(dataloader)
     images, labels = next(data_iter)  # Fetch a random batch
 
+    img = xai.invert_normalization(images[0])
     # Display the first image in the batch
-    img = images[0].permute(1, 2, 0)  # Change dimensions for display
+    img = img.permute(1, 2, 0)  # Change dimensions for display
     label = labels[0].item()  # Get label for the first image
 
     plt.imshow(img)
