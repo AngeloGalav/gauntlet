@@ -22,6 +22,7 @@ import time
 print("Server is starting...")
 
 app = Flask(__name__)
+FLASK_APP_PORT = int(os.getenv("FLASK_APP_PORT", 5000))
 CORS(app) # Enable CORS for all routes
 
 # non-interactive backend
@@ -124,4 +125,4 @@ def process_image():
     return send_file(image_result_buf, mimetype='image/png')
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, threaded=True, host="0.0.0.0", port=FLASK_APP_PORT)

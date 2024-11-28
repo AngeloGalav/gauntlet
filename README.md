@@ -17,7 +17,7 @@ Place the respective datasets folders in the data folder:
 ## TODOs
 - [ ] Leftover models stuff
     - [x] test standard CNN
-    - [x] Implement data augmentation in Mixed model (maybe turn data augmentation dataset creation step into a function?)
+    - [x] Implement data augmentation in Mixed model
 
 - [ ] do Xai stuff
     - [x] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
@@ -38,7 +38,7 @@ Place the respective datasets folders in the data folder:
     - [x] error handling
         - [x] handle server status
     - [x] server url stuff
-    - [ ] Add about page? (EXTREMELY OPTIONAL)
+    - [x] Add about page? (EXTREMELY OPTIONAL)
     - [x] add cute lil rotate animation
 
 - [ ] webapp server

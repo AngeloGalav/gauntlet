@@ -13,3 +13,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Custom modal animation */
+.modal-dialog {
+  animation: slide-up 0.4s ease-out;
+}

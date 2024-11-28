@@ -2,14 +2,14 @@ import React from "react";
 import "./NavBar.css"; // Import the CSS file
 import Logo from "../logo.png" 
 
-function Navbar() {
+function Navbar({ onAboutClick }) {
   return (
     <nav className="navbar">
-      <div class="navbar-logo gloock-regular">
+      <div className="navbar-logo gloock-regular">
           <img src={Logo} className="logo" alt="logo" />
           Gauntlet xAI
       </div>
-      <div className="navbar-button">
+      <div className="navbar-button" onClick={onAboutClick}>
         About
       </div>
     </nav>

@@ -140,7 +140,6 @@ function ImageProcessingPage() {
         </div>
         }
       </div>
-    
       {/* Incoming Image Display */}
       {(isLoading || incomingImage) &&
         (<div style={{ marginBottom: "20px" }}>
@@ -203,7 +202,7 @@ function ImageProcessingPage() {
           value="AblationCAM"
           onChange={() => setSelectedBackend("AblationCAM")}
           type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
-        <label className="form-check-label" for="flexRadioDefault1">
+        <label className="form-check-label" htmlFor="flexRadioDefault1">
           AblationCAM
         </label>
       </div>
@@ -212,7 +211,7 @@ function ImageProcessingPage() {
           value="ScoreCAM"
           onChange={() => setSelectedBackend("ScoreCAM")}
           type="radio" name="flexRadioDefault" id="flexRadioDefault2" />
-        <label className="form-check-label" for="flexRadioDefault2">
+        <label className="form-check-label" htmlFor="flexRadioDefault2">
         ScoreCAM
         </label>
       </div>
@@ -222,7 +221,7 @@ function ImageProcessingPage() {
           value="LIME"
           onChange={() => setSelectedBackend("LIME")}
           type="radio" name="flexRadioDefault" id="flexRadioDefault3" />
-        <label className="form-check-label" for="flexRadioDefault3">
+        <label className="form-check-label" htmlFor="flexRadioDefault3">
           LIME
         </label>
       </div>

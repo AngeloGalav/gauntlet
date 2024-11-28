@@ -1,0 +1,20 @@
+services:
+
+  backend:
+    build:
+      context: ./webapp
+    container_name: backend
+    ports:
+      # - "1883:1883"
+      - "5000:5000"
+    volumes:
+      - ./checkpoints:/app/checkpoints
+    environment:
+      - FLASK_APP_PORT=5000
+
+  frontend:
+    build:
+      context: ./webapp/frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"

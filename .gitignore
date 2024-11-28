@@ -3,7 +3,8 @@ data/CIFAKE/test
 results
 .venv
 __pycache__
-checkpoints
+checkpoints/*
+!checkpoints/.gitkeep
 outputs
 data/RealVsAiArt/AiArtData
 data/RealVsAiArt/RealArt
