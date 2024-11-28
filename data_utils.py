@@ -3,6 +3,7 @@ from PIL import Image
 from torch import Tensor
 from torch.utils.data import Dataset, random_split, Subset
 from typing import List, Tuple
+import random
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -25,6 +26,15 @@ class CIFAKEDataset(Dataset):
 
         # Create the list of image paths and their corresponding labels
         self.image_paths, self.labels = self.read_file()
+    
+    def shuffle(self):
+        """
+        Shuffle the dataset by randomly permuting the image paths and labels.
+        """
+        combined = list(zip(self.image_paths, self.labels))
+        random.shuffle(combined)
+        self.image_paths, self.labels = zip(*combined)
+        self.image_paths, self.labels = list(self.image_paths), list(self.labels)
 
     def read_file(self) -> Tuple[List[str], List[int]]:
         image_paths = []
@@ -93,6 +103,15 @@ class RVAADataset(Dataset):
                 labels.append(1)  # Label for FAKE images
 
         return image_paths, labels
+    
+    def shuffle(self):
+        """
+        Shuffle the dataset by randomly permuting the image paths and labels.
+        """
+        combined = list(zip(self.image_paths, self.labels))
+        random.shuffle(combined)
+        self.image_paths, self.labels = zip(*combined)
+        self.image_paths, self.labels = list(self.image_paths), list(self.labels)
 
     def __len__(self) -> int:
         return len(self.image_paths)
