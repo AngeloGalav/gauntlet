@@ -10,65 +10,29 @@
 Pending
 
 ## How to use:
-Place the respective datasets folders in the data folder:
+To use the Notebooks and the WebApp, you'll need to first create python environment and install the required packages using pip:
+1. `python -m venv .venv`
+2. On Linux: `source .venv/bin/activate`
+2b. On Windows: `.venv/Scripts/activate`
+3. `pip install -r requirements.txt`
+
+### Notebooks
+Before running the notebooks, place the respective datasets folders in the data folder:
 - CIFAKE contents into CIFAKE folder
 - RealVsAiArt contents into RealVsAiArt folder
 
+### WebApp
+To run the webapp, use the `./start_webapp` script
+
 ## TODOs
-- [ ] Leftover models stuff
-    - [x] test standard CNN
-    - [x] Implement data augmentation in Mixed model
-
-- [ ] do Xai stuff
-    - [x] batch lime/gradcam (no display, only save) (i.e. run and save all gradcam for a batch or collection of batches to see them later)
-    - [x] test to see if we can use less layers in gradcam for speeding up the computation (result: layer4 should be fine for resnet).
-    - [x] create gradcam/lime function that takes a SINGLE image as input (in the format found in server.py) and returns the plt object!!!
-    - [x] extend webapp_gradcam function to work with lime as well
-    - [x] check every function to confirm it work with the new setup
-    - [x] IMPORTANT!!! FIX LABEL TITLE IN GRADCAM/LIME BATCH (SET PREDICTION TITLE INSTEAD OF DATALOADER TITLE) AND ADD COLOR DEPENDING ON THE CORRECTNESS OF PREDICTION!!!
-
-- [ ] webapp frontend
-    - [x] dynamic model selection
-    - [x] fix position of images/buttons (make them "stay put") (optional)
-    - [x] add code for upload to webapp server
-    - [x] fix image sizes
-    - [x] add radio buttons for lime/gradcam
-    - [x] add input for server address
-    - [x] hide incoming image from server w/ loading animation until server response
-    - [x] error handling
-        - [x] handle server status
-    - [x] server url stuff
-    - [x] Add about page? (EXTREMELY OPTIONAL)
-    - [x] add cute lil rotate animation
-
-- [ ] webapp server
-    - [x] create tester app
-    - [x] create gradcam func for single image
-    - [x] select model stuff
-    - [x] select backend stuff
-    - [x] select LIME backend on server (aka need a function like webapp_gradcam but for LIME)
-
-- [ ] Relazione
-    - [x] understand what each lime color mean (green -> areas that encourages top predictions, red -> the opposite)
-    - [ ] read about current SoTA approaches (maybe implement some of the ideas they do?)
-    - [ ] Introduction
-        - [ ] Write a long ass introduction, it should include (the following tasks)
-        - [ ] description of the problem, why is it useful (maybe statistics of internet scammed people estimate etc)
-        - [ ] description of some SoTA approaches and how they work
-
-- [ ] Testing
-    - [ ] RVAA beefy testing, tends to predict images as FAKE too much, and its gradcam is broken too.
-    - [ ] Run Mixed notebook too and test it with the webapp
-
-- [ ] Notebooks
-    - [ ] Beautify notebooks for the final consegna
-
-- [ ] Misc
-    - [x] do start script for webapp
-    - [ ] Add text for various explanations
-    - [ ] solve all the other code TODOs (ctrl+shift+f TODO)
-
-- [x] REWORK EVERYTHING SO THAT WE HAVE 2 OUTPUT NEURONS INSTEAD OF 1!!!!!!!!!
+Final TODOs:
+- [ ] Update scripts
+- [ ] Report
+    - [ ] Add final part in introduction (or is it ready like this?)
+    - [ ] Write the rest
+- [ ] CIFAKE notebook improve
+- [ ] Write beamer slides
+- [ ] COOL EXPERIMENT: TRY USING CIFAKE MODEL ON RVAA (will do it in the future)
 
 
 ## Data

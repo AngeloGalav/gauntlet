@@ -17,12 +17,6 @@ def set_display_mode(mode):
     DISPLAY_MODE = mode
     return DISPLAY_MODE
 
-# TODO: delete this function if it not used anywhere
-def plot_losses(losses):
-    plt.plot(losses)
-    plt.show()
-
-# TODO: test for loss as well
 def plot_generic_metrics(values, metric: str, model_name=None):
     """
     plot function used to compare the metrics between the training and

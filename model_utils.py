@@ -35,7 +35,6 @@ def fix_random(seed: int) -> None:
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-# TODO: test this model
 class CNN(nn.Module):
     def __init__(self, num_classes=2, input_width=224, input_height=224):
         super(CNN, self).__init__()

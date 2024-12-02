@@ -345,7 +345,6 @@ def webapp_lime(image, model):
         )
 
         # get the image and mask for the top predicted class
-        #TODO: understand what this img object is
         img, mask = explanation.get_image_and_mask(
             explanation.top_labels[0],
             positive_only=False,
