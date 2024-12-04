@@ -30,15 +30,11 @@ Final TODOs:
 - [ ] Report
     - [ ] Add final part in introduction (or is it ready like this?)
     - [ ] Write the rest
-- [ ] CIFAKE notebook improve
+- [x] CIFAKE notebook improve
 - [ ] Write beamer slides
 - [ ] COOL EXPERIMENT: TRY USING CIFAKE MODEL ON RVAA (will do it in the future)
+- [ ] Re-run all notebooks
 
-
-## Data
-https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download
-
-## Useful links
-https://coderzcolumn.com/tutorials/artificial-intelligence/lime-explain-keras-image-classification-network-predictions
-
-https://www.kaggle.com/code/hamedaraab/classification-of-real-and-ai-generated-images#Utilities
+## Datasets
+- RVAA: https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download
+- CIFAKE: https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images
