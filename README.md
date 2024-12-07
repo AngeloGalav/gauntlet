@@ -32,7 +32,7 @@ Final TODOs:
     - [ ] Write the rest
 - [x] CIFAKE notebook improve
 - [ ] Write beamer slides
-- [ ] COOL EXPERIMENT: TRY USING CIFAKE MODEL ON RVAA (will do it in the future)
+- [x] COOL EXPERIMENT: TRY USING CIFAKE MODEL ON RVAA (will do it in the future)
 - [ ] Re-run all notebooks
 
 ## Datasets
