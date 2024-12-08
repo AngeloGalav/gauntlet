@@ -30,20 +30,22 @@ Before running the notebooks, place the respective datasets folders in the data 
 - RealVsAiArt contents into RealVsAiArt folder
 
 ### WebApp
-To run the webapp, use the `./start_webapp` script. If for some reason it doesn't work, y
-
+To run the webapp, use the `./start_webapp` script. If for some reason it doesn't work, you can instead use the following commands:
+```
+python webapp/server.py
+cd webapp/frontend
+npm install
+npm start
+```
 
 ## TODOs
 Final TODOs:
-- [ ] Update scripts
 - [ ] Report
     - [ ] Add final part in introduction (or is it ready like this?)
     - [ ] Write the rest
-- [x] CIFAKE notebook improve
 - [ ] Write beamer slides
-- [x] COOL EXPERIMENT: TRY USING CIFAKE MODEL ON RVAA (will do it in the future)
 - [ ] Re-run all notebooks
 
 ## Datasets used
-- RVAA: https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download
-- CIFAKE: https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images
+- [RVAA](https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download)
+- [CIFAKE](https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images)
