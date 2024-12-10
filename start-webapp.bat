@@ -1,7 +1,7 @@
 @echo off
 
 :: Start the Python server
-start "" python.exe webapp/server.py
+start "" cmd /k python.exe webapp/server.py
 
 :: Navigate to the frontend directory
 cd webapp\frontend
