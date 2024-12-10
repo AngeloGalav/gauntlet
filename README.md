@@ -11,7 +11,7 @@ GAUNTLET is an explainable model for detecting AI-generated images. By examining
 
 Our aim is not just to provide a tool for people to use, but also to educate them into learning the characteristics of an AI generated image, so that they can detect and avoid malicious content without the necessity of this app. In a sense, the app should train the user so that it won't rely on this app. Kinda crazy if you think about it.
 
-Click the following image to watch a video demo of GAUNTLET:
+You can click the following image to watch a video demo of GAUNTLET:
 [![Watch the video](https://img.youtube.com/vi/THj-Gn8MYkw/maxresdefault.jpg)](https://www.youtube.com/watch?v=THj-Gn8MYkw)
 
 More details can be found in `report.pdf` or in the notebooks.
