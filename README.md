@@ -7,8 +7,7 @@
 > _"I used the AI to destroy the AI"_
 \- Thanos if he was a data scientist
 
-GAUNTLET is an explainable model for detecting AI-generated visual
-content. By examining the finer characteristics of AI generated images (such as noise patterns), it can distinguish AI-generated images from human-crafted ones. In addition, it outputs a heatmap which highlights the features that activated the model.
+GAUNTLET is an explainable model for detecting AI-generated images. By examining the finer characteristics of these pictures (such as noise patterns), it can distinguish AI-generated images from human-crafted ones. In addition, it outputs a heatmap which highlights the features that activated the model.
 
 Our aim is not just to provide a tool for people to use, but also to educate them into learning the characteristics of an AI generated image, so that they can detect and avoid malicious content without the necessity of this app. In a sense, the app should train the user so that it won't rely on this app. Kinda crazy if you think about it.
 
