@@ -38,14 +38,6 @@ npm install
 npm start
 ```
 
-## TODOs
-Final TODOs:
-- [ ] Report
-    - [ ] Add final part in introduction (or is it ready like this?)
-    - [ ] Write the rest
-- [ ] Write beamer slides
-- [ ] Re-run all notebooks
-
 ## Datasets used
 - [RVAA](https://www.kaggle.com/datasets/cashbowman/ai-generated-images-vs-real-images?resource=download)
 - [CIFAKE](https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images)
