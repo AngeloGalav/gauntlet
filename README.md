@@ -14,7 +14,7 @@ Our aim is not just to provide a tool for people to use, but also to educate the
 You can click the following image to watch a video demo of GAUNTLET:
 [![Watch the video](https://img.youtube.com/vi/THj-Gn8MYkw/maxresdefault.jpg)](https://www.youtube.com/watch?v=THj-Gn8MYkw)
 
-More details can be found in `report.pdf` or in the notebooks.
+More details can be found in `docs/report.pdf` or in the notebooks.
 
 ## How to use:
 To use the Notebooks and the WebApp, you'll need to first create python environment and install the required packages using pip:
